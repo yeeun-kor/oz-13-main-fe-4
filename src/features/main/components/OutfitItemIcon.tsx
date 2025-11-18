@@ -1,4 +1,3 @@
-// components/OutfitItemIcon.tsx (업데이트)
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ClothingItem } from '../types/clothing';

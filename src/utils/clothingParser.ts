@@ -1,5 +1,5 @@
 import { clothingIconMap, defaultIconByCategory } from '../constants/icons/clothingIcon';
-import { ClothingItem, OutfitRecommendation } from '../pages/main/types/clothing';
+import { ClothingItem, OutfitRecommendation } from '../features/main/types/clothing';
 
 const getCategory = (itemName: string): ClothingItem['category'] => {
   const outerKeywords = [

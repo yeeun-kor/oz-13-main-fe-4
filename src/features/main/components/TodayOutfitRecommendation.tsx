@@ -3,7 +3,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ThumbUp from '@mui/icons-material/ThumbUp';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { outfitAPI } from '../../../features/recommendation/api/clothingAPI';
+import { outfitAPI } from '../../recommendation/api/clothingAPI';
 import { parseOutfitString } from '../../../utils/clothingParser';
 import {
   NavigationButton,
