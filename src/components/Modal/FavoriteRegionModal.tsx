@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import {
   Button,
   FormControl,
@@ -6,10 +7,9 @@ import {
   Select,
   SelectChangeEvent,
 } from '@mui/material';
-import BaseModal from './BaseModal';
 import { useState } from 'react';
 import { REGIONS } from '../../constants/region';
-import styled from '@emotion/styled';
+import BaseModal from './BaseModal';
 
 interface FavoriteRegionModalProps {
   isOpen: boolean;
@@ -69,8 +69,8 @@ const FavoriteRegionModal = ({ isOpen, onClose, onSave }: FavoriteRegionModalPro
           </Button>
           <Button
             onClick={handleSave}
-            variant='contained'
-            color='primary'
+            variant='outlined'
+            color='secondary'
             disabled={!city || !district}
           >
             저장
