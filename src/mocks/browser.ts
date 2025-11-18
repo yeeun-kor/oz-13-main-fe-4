@@ -11,6 +11,6 @@ export const worker = setupWorker(
   ...outfitHandlers,
   ...authHandlers,
   ...diaryHandlers,
-  ...locationHandlers
+  ...locationHandlers,
   ...favoriteHandlers
 );
