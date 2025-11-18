@@ -3,89 +3,180 @@ import { CgBot } from 'react-icons/cg';
 import { IoSend, IoClose } from 'react-icons/io5';
 import { useState, useEffect, useRef } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Message } from '../types/chat';
+import { useSendMessage, useChatHistory } from '../hooks/useChatQueries';
 
-interface Message {
-  id: number;
-  type: 'bot' | 'user';
-  content: string;
-}
+const KEYWORDS = ['서비스 소개', '추천 옷차림', '이번주 날씨'];
+const CHAT_SESSION_KEY = 'chat-session-id';
 
-const KEYWORDS = ['오늘 날씨', '추천 옷차림', '이번주 날씨'];
-
-const KEYWORD_RESPONSES: { [key: string]: string } = {
-  '오늘 날씨': '오늘은 맑고 18도 정도로, 산책이나 가벼운 외출하기 좋은 날씨예요~',
-  '추천 옷차림': '오늘은 가벼운 겉옷만 입어도 괜찮아요. 활동하기 편한 옷차림을 추천드려요!',
-  '이번주 날씨':
-    '이번주는 대체로 맑고 쾌적한 날씨가 예상돼요. 기온 변화가 있으니 아침저녁으로는 가벼운 겉옷 챙기시는 게 좋아요.',
+const keywordsAnswer: Record<string, string> = {
+  '서비스 소개':
+    '사용자가 선택한 위치에 맞는 날씨 정보와 그에 맞는 옷 조합을 소개하는 서비스입니다. 원하는 지역을 즐겨찾기에 추가하고 날씨 사진 또는 오늘 정한 스타일을 찍은 사진을 업로드 할 수 있는 일기장 페이지 또한 마련되어 있습니다.',
 };
 
 const Chatbot = () => {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: Date.now(),
+      role: 'ai',
+      text: '안녕하세요! 날씨 기반 옷차림 추천 챗봇입니다. 궁금한 내용을 선택하거나 질문해주세요!',
+    },
+  ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const sendMessage = useSendMessage();
+
+  // localStorage에서 session_id 가져오기
+  const [sessionId, setSessionId] = useState<string | null>(() => {
+    return localStorage.getItem(CHAT_SESSION_KEY);
+  });
+
+  // 페이지네이션 상태
+  const [beforeId, setBeforeId] = useState<number | undefined>(undefined);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+
+  const { data: chatHistory } = useChatHistory({
+    sessionId: sessionId || undefined,
+    limit: 20,
+    beforeId,
+  });
 
   useEffect(() => {
-    // 초기 환영 메시지
-    setMessages([
-      {
-        id: Date.now(),
-        type: 'bot',
-        content:
-          '안녕하세요! 날씨 기반 옷차림 추천 챗봇입니다. 궁금한 내용을 선택하거나 질문해주세요!',
-      },
-    ]);
-  }, []);
+    if (sessionId) {
+      localStorage.setItem(CHAT_SESSION_KEY, sessionId);
+    }
+  }, [sessionId]);
+
+  // 채팅 히스토리 로드 시 메시지 업데이트
+  useEffect(() => {
+    if (chatHistory?.messages && chatHistory.messages.length > 0) {
+      if (beforeId) {
+        // 이전 메시지 로드 시 기존 메시지에 추가 (중복 제거)
+        setMessages((prev) => {
+          const newMessages = chatHistory.messages.filter(
+            (newMsg) => !prev.some((existingMsg) => existingMsg.id === newMsg.id)
+          );
+          return [...newMessages, ...prev];
+        });
+        setIsLoadingMore(false);
+      } else {
+        // 최초 로드 또는 새로고침
+        setMessages(chatHistory.messages);
+      }
+      setHasMore(chatHistory.has_more);
+    }
+  }, [chatHistory, beforeId]);
 
   useEffect(() => {
-    // 메시지가 추가될 때마다 스크롤을 아래로
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!isLoadingMore) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoadingMore]);
 
-  const handleSendMessage = () => {
+  // 스크롤 이벤트로 이전 메시지 로드
+  const handleScroll = () => {
+    const chatBody = chatRef.current;
+    if (!chatBody || isLoadingMore || !hasMore) return;
+
+    if (chatBody.scrollTop === 0) {
+      setIsLoadingMore(true);
+      // next_before_id를 사용하여 이전 메시지 로드
+      if (chatHistory?.next_before_id) {
+        setBeforeId(chatHistory.next_before_id);
+      }
+    }
+  };
+
+  const handleSendMessage = async () => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage) return;
 
     const currentMessage = trimmedMessage;
 
-    // 사용자 메시지 추가
     const userMessage: Message = {
       id: Date.now(),
-      type: 'user',
-      content: currentMessage,
+      role: 'user',
+      text: currentMessage,
     };
     setMessages((prev) => [...prev, userMessage]);
     setMessage('');
 
-    // 임시로 setTimeout으로 봇 응답 시뮬레이션
-    setTimeout(() => {
+    try {
+      const response = await sendMessage.mutateAsync({
+        message: currentMessage,
+      });
+
+      if (response.session_id) {
+        setSessionId(response.session_id);
+      }
+
       const botMessage: Message = {
-        id: Date.now() + 1,
-        type: 'bot',
-        content: `"${currentMessage}"에 대한 답변입니다.`,
+        id: Date.now(),
+        role: 'ai',
+        text: response.response,
+        created_at: response.created_at,
       };
       setMessages((prev) => [...prev, botMessage]);
-    }, 500);
+    } catch (error) {
+      // 에러 발생 시 안내 메시지 표시
+      const errorMessage: Message = {
+        id: Date.now(),
+        role: 'ai',
+        text: '죄송합니다. 메시지 전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   };
 
-  const handleKeywordClick = (keyword: string) => {
+  const handleKeywordClick = async (keyword: string) => {
     // 사용자가 키워드를 클릭한 것처럼 메시지 추가
+    const timestamp = Date.now();
     const userMessage: Message = {
-      id: Date.now(),
-      type: 'user',
-      content: keyword,
+      id: timestamp,
+      role: 'user',
+      text: keyword,
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    // 키워드에 대한 봇 응답
-    setTimeout(() => {
+    if (keywordsAnswer[keyword]) {
       const botMessage: Message = {
-        id: Date.now() + 1,
-        type: 'bot',
-        content: KEYWORD_RESPONSES[keyword],
+        id: timestamp + 1,
+        role: 'ai',
+        text: keywordsAnswer[keyword],
       };
       setMessages((prev) => [...prev, botMessage]);
-    }, 300);
+      return;
+    }
+
+    try {
+      const response = await sendMessage.mutateAsync({
+        message: keyword,
+      });
+
+      if (response.session_id) {
+        setSessionId(response.session_id);
+      }
+
+      // 봇 응답을 UI에 추가
+      const botMessage: Message = {
+        id: Date.now(),
+        role: 'ai',
+        text: response.response,
+        created_at: response.created_at,
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error('메시지 전송 실패:', error);
+      const errorMessage: Message = {
+        id: Date.now(),
+        role: 'ai',
+        text: '죄송합니다. 메시지 전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   };
 
   return isChatOpen ? (
@@ -110,19 +201,24 @@ const Chatbot = () => {
       </div>
 
       {/* 메시지 영역 */}
-      <div css={styles.chatBody}>
+      <div css={styles.chatBody} ref={chatRef} onScroll={handleScroll}>
+        {isLoadingMore && hasMore && (
+          <div style={{ textAlign: 'center', padding: '10px', color: '#999' }}>
+            이전 메시지 로드 중...
+          </div>
+        )}
         {messages.map((msg) => (
           <div key={msg.id}>
-            {msg.type === 'bot' ? (
+            {msg.role === 'ai' ? (
               <div css={styles.messageWrapper}>
                 <div css={styles.messageAvatar}>
                   <CgBot />
                 </div>
-                <div css={styles.messageBubble}>{msg.content}</div>
+                <div css={styles.messageBubble}>{msg.text}</div>
               </div>
             ) : (
               <div css={styles.messageWrapperUser}>
-                <div css={styles.messageBubbleUser}>{msg.content}</div>
+                <div css={styles.messageBubbleUser}>{msg.text}</div>
               </div>
             )}
           </div>
