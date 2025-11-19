@@ -11,10 +11,9 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
+import WbSunnyTwoToneIcon from '@mui/icons-material/WbSunnyTwoTone';
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -25,6 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import CardActions from '@mui/material/CardActions';
+import { blue } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 import FavoriteRegionModal from '../../../components/Modal/FavoriteRegionModal';
@@ -65,23 +65,20 @@ function SortableFavoriteCard({
 
   return (
     <Grid ref={setNodeRef} style={style} size={{ xs: 12, md: 4 }}>
-      <Card>
+      <Card
+        {...attributes}
+        {...listeners}
+        sx={{ cursor: 'grab', border: `solid,${blue[500]},0.3px` }}
+      >
         <CardHeader
-          avatar={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <IconButton {...attributes} {...listeners} sx={{ cursor: 'grab' }}>
-                <DragIndicatorIcon />
-              </IconButton>
-              <Avatar>📍</Avatar>
-            </Box>
-          }
+          avatar={<WbSunnyTwoToneIcon fontSize='large' color='warning' />}
           action={
             <IconButton onClick={() => onDelete(favorite.id)} sx={{ border: 'none' }}>
               <CancelIcon fontSize='large' />
             </IconButton>
           }
           title={
-            <Typography variant='h6' component='div'>
+            <Typography variant='h6' component='div' sx={{ my: 2 }}>
               {favorite.city} {favorite.district}
             </Typography>
           }
@@ -118,7 +115,7 @@ function SortableFavoriteCard({
           ) : (
             <Button
               variant='contained'
-              color='secondary'
+              color='primary'
               size='small'
               startIcon={<EditIcon />}
               onClick={() => onEditStart(favorite.id, favorite.alias || '')}

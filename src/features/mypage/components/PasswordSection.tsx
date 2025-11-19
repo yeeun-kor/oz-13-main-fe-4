@@ -34,7 +34,7 @@ export default function PasswordSection() {
       },
       (message) => {
         setModalTitle('비밀번호 수정');
-        setModalMessage(message);
+        setModalMessage(`${message}. 현재 비밀번호와 일치하게 입력해주세요 `);
         setShowModal(true);
       }
     );
@@ -61,7 +61,7 @@ export default function PasswordSection() {
             <Button
               onClick={() => setIsPasswordEditMode(true)}
               variant='contained'
-              color='secondary'
+              color='primary'
               size='small'
               type='button'
             >
@@ -90,16 +90,16 @@ export default function PasswordSection() {
 
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
           <FormGrid flex={1}>
-            <FormLabel htmlFor='oldPassword'>현재 비밀번호</FormLabel>
+            <FormLabel htmlFor='currentPassword'>현재 비밀번호</FormLabel>
             <TextField
-              {...register('oldPassword')}
-              error={!!errors.oldPassword}
-              helperText={errors.oldPassword?.message}
+              {...register('currentPassword')}
+              error={!!errors.currentPassword}
+              helperText={errors.currentPassword?.message}
               disabled={!isPasswordEditMode}
               fullWidth
               placeholder='••••••'
               type='password'
-              id='oldPassword'
+              id='currentPassword'
             />
           </FormGrid>
           <FormGrid flex={1}>

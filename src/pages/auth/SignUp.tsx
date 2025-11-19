@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
-  CssBaseline,
   Divider,
   FormControl,
   FormControlLabel,
@@ -29,7 +28,6 @@ import {
 import { useNicknameValidateMutation } from '../../features/auth/hooks/useNicknameValidateMutation';
 import { useSignUpMutation } from '../../features/auth/hooks/useSignUpMutation';
 import { FormField, signUpSchema } from '../../features/auth/types/zodTypes';
-import AppTheme from '../../styles/AppTheme';
 import { CardMui, ContainerMui } from '../../styles/AuthStyle';
 
 export default function SignUp() {
@@ -49,8 +47,8 @@ export default function SignUp() {
 
   //회원가입 버튼 클릭하면?mutation 불러서 비동기 통신해야함.
   const onSubmit: SubmitHandler<FormField> = (data) => {
-    //🎃confirm비밀번호는 제외해야함 -> 구조분해 할당
-    const { passwordConfirm, ...rest } = data;
+    //🎃confirm비밀번호와 emailCode는 제외해야함 -> 구조분해 할당
+    const { passwordConfirm, emailCode, ...rest } = data;
     signUpMutation.mutate(rest, {
       onSuccess: () => {
         alert('회원가입 성공👋🏻');
@@ -156,256 +154,252 @@ export default function SignUp() {
       email: '',
       password: '',
       passwordConfirm: '',
-      gender: 'F', //디폴트값 선택되게끔
-      age: 'thirty',
+      gender: 'W', //디폴트값 선택되게끔
+      age_group: '30',
       emailCode: '',
     },
   });
 
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
-
-      <ContainerMui direction='column' justifyContent='space-between'>
-        <CardMui variant='outlined'>
-          {/* 에러 메시지 표시 */}
-          {signUpMutation.error && <p>에러 발생!</p>}
-          {/* 모달창 */}
-          <BaseModal
-            isOpen={nicknameShowModal}
-            onClose={() => setNickanameShowModal(false)}
-            title='닉네임 중복 확인'
-            subtitle={modalMessage}
-            footer={
-              <Button onClick={() => setNickanameShowModal(false)} variant='contained'>
-                확인
-              </Button>
-            }
-          />
-          <Typography
-            component='h1'
-            variant='h4'
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
-            회원가입
-          </Typography>
-          <Box
-            component='form'
-            sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <FormControl fullWidth>
-              <FormLabel htmlFor='name'>이름</FormLabel>
+    <ContainerMui direction='column' justifyContent='space-between'>
+      <CardMui variant='outlined'>
+        {/* 에러 메시지 표시 */}
+        {signUpMutation.error && <p>에러 발생!</p>}
+        {/* 모달창 */}
+        <BaseModal
+          isOpen={nicknameShowModal}
+          onClose={() => setNickanameShowModal(false)}
+          title='닉네임 중복 확인'
+          subtitle={modalMessage}
+          footer={
+            <Button onClick={() => setNickanameShowModal(false)} variant='contained'>
+              확인
+            </Button>
+          }
+        />
+        <Typography
+          component='h1'
+          variant='h4'
+          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+        >
+          회원가입
+        </Typography>
+        <Box
+          component='form'
+          sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <FormControl fullWidth>
+            <FormLabel htmlFor='name'>이름</FormLabel>
+            <TextField
+              {...register('name')}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              autoComplete='name'
+              fullWidth
+              id='name'
+              placeholder='홍길동'
+              color={errors.name ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <FormLabel htmlFor='nickname'>닉네임</FormLabel>
+            <Stack direction='row' spacing={1}>
               <TextField
-                {...register('name')}
-                error={!!errors.name}
-                helperText={errors.name?.message}
-                autoComplete='name'
+                {...register('nickname')}
+                error={!!errors.nickname}
+                helperText={errors.nickname?.message}
                 fullWidth
-                id='name'
-                placeholder='홍길동'
-                color={errors.name ? 'error' : 'primary'}
+                id='nickname'
+                placeholder='동해번쩍 서해번쩍'
+                color={errors.nickname ? 'error' : 'primary'}
+                disabled={isNicknameValidated} // 추가
+              />
+              <Button
+                variant='contained'
+                color='info'
+                onClick={handleNicknameValidate}
+                disabled={isNicknameValidated}
+                type='button'
+                sx={{ minWidth: 'fit-content', whiteSpace: 'nowrap' }}
+              >
+                중복확인
+              </Button>
+            </Stack>
+          </FormControl>
+
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{
+              width: '100%',
+            }}
+          >
+            <FormControl sx={{ flex: 1 }}>
+              <FormLabel htmlFor='gender'>성별</FormLabel>
+              <Controller
+                name='gender'
+                control={control}
+                render={({ field }) => (
+                  <RadioGroup {...field} row css={{ justifyContent: 'space-around' }}>
+                    <FormControlLabel value='M' control={<Radio />} label='남자' />
+                    <FormControlLabel value='W' control={<Radio />} label='여자' />
+                  </RadioGroup>
+                )}
               />
             </FormControl>
-            <FormControl fullWidth>
-              <FormLabel htmlFor='nickname'>닉네임</FormLabel>
-              <Stack direction='row' spacing={1}>
-                <TextField
-                  {...register('nickname')}
-                  error={!!errors.nickname}
-                  helperText={errors.nickname?.message}
-                  fullWidth
-                  id='nickname'
-                  placeholder='동해번쩍 서해번쩍'
-                  color={errors.nickname ? 'error' : 'primary'}
-                  disabled={isNicknameValidated} // 추가
-                />
-                <Button
-                  variant='contained'
-                  color='info'
-                  onClick={handleNicknameValidate}
-                  disabled={isNicknameValidated}
-                  type='button'
-                  sx={{ minWidth: 'fit-content', whiteSpace: 'nowrap' }}
-                >
-                  중복확인
-                </Button>
-              </Stack>
+            <FormControl sx={{ flex: 1 }}>
+              <FormLabel htmlFor='named-select'>연령대</FormLabel>
+              <Controller
+                name='age_group'
+                control={control}
+                render={({ field }) => (
+                  <Select {...field} id='named-select'>
+                    <MenuItem value={'10'}>10대</MenuItem>
+                    <MenuItem value={'20'}>20대</MenuItem>
+                    <MenuItem value={'30'}>30대</MenuItem>
+                    <MenuItem value={'40'}>40대</MenuItem>
+                    <MenuItem value={'50'}>50대</MenuItem>
+                    <MenuItem value={'60'}>60대</MenuItem>
+                  </Select>
+                )}
+              />
             </FormControl>
+          </Stack>
 
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={2}
-              sx={{
-                width: '100%',
-              }}
+          <FormControl>
+            <FormLabel htmlFor='email'>이메일</FormLabel>
+            <TextField
+              {...register('email')}
+              disabled={isEmailVerified}
+              fullWidth
+              id='email'
+              placeholder='your@email.com'
+              autoComplete='email'
+              variant='outlined'
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              color={errors.email ? 'error' : 'primary'}
+            />
+            <Button
+              variant='contained'
+              color='success'
+              type='button'
+              onClick={handleEmailValidate}
+              disabled={isEmailVerified}
             >
-              <FormControl sx={{ flex: 1 }}>
-                <FormLabel htmlFor='gender'>성별</FormLabel>
-                <Controller
-                  name='gender'
-                  control={control}
-                  render={({ field }) => (
-                    <RadioGroup {...field} row css={{ justifyContent: 'space-around' }}>
-                      <FormControlLabel value='M' control={<Radio />} label='남자' />
-                      <FormControlLabel value='F' control={<Radio />} label='여자' />
-                    </RadioGroup>
-                  )}
-                />
-              </FormControl>
-              <FormControl sx={{ flex: 1 }}>
-                <FormLabel htmlFor='named-select'>연령대</FormLabel>
-                <Controller
-                  name='age'
-                  control={control}
-                  render={({ field }) => (
-                    <Select {...field} id='named-select'>
-                      <MenuItem value={'ten'}>10대</MenuItem>
-                      <MenuItem value={'twenty'}>20대</MenuItem>
-                      <MenuItem value={'thirty'}>30대</MenuItem>
-                      <MenuItem value={'fourthy'}>40대</MenuItem>
-                      <MenuItem value={'fifth'}>50대</MenuItem>
-                      <MenuItem value={'sixth'}>60대</MenuItem>
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Stack>
+              인증코드 보내기
+            </Button>
+          </FormControl>
 
+          {isEmailVerified ? (
             <FormControl>
-              <FormLabel htmlFor='email'>이메일</FormLabel>
+              <FormLabel htmlFor='emailCode'>이메일 인증코드</FormLabel>
               <TextField
-                {...register('email')}
-                disabled={isEmailVerified}
+                {...register('emailCode')}
+                error={!!errors.emailCode}
+                helperText={errors.emailCode?.message}
                 fullWidth
-                id='email'
-                placeholder='your@email.com'
-                autoComplete='email'
+                id='emailCode'
+                placeholder='123456'
                 variant='outlined'
-                error={!!errors.email}
-                helperText={errors.email?.message}
-                color={errors.email ? 'error' : 'primary'}
+                disabled={isEmailCodeChecked}
               />
               <Button
                 variant='contained'
                 color='success'
                 type='button'
-                onClick={handleEmailValidate}
-                disabled={isEmailVerified}
+                onClick={handleEmailCodeValidate}
+                disabled={isEmailCodeChecked}
               >
-                인증코드 보내기
+                인증코드 확인
               </Button>
             </FormControl>
+          ) : (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
+            <></>
+          )}
+          <BaseModal
+            isOpen={emailShowModal}
+            onClose={() => setEmailShowModal(false)}
+            title='이메일 인증코드'
+            subtitle={modalMessage}
+            footer={
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  setEmailShowModal(false);
+                }}
+              >
+                확인
+              </Button>
+            }
+          />
 
-            {isEmailVerified ? (
-              <FormControl>
-                <FormLabel htmlFor='emailCode'>이메일 인증코드</FormLabel>
-                <TextField
-                  {...register('emailCode')}
-                  error={!!errors.emailCode}
-                  helperText={errors.emailCode?.message}
-                  fullWidth
-                  id='emailCode'
-                  placeholder='123456'
-                  variant='outlined'
-                  disabled={isEmailCodeChecked}
-                />
-                <Button
-                  variant='contained'
-                  color='success'
-                  type='button'
-                  onClick={handleEmailCodeValidate}
-                  disabled={isEmailCodeChecked}
-                >
-                  인증코드 확인
-                </Button>
-              </FormControl>
-            ) : (
-              // eslint-disable-next-line react/jsx-no-useless-fragment
-              <></>
-            )}
-            <BaseModal
-              isOpen={emailShowModal}
-              onClose={() => setEmailShowModal(false)}
-              title='이메일 인증코드'
-              subtitle={modalMessage}
-              footer={
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={() => {
-                    setEmailShowModal(false);
-                  }}
-                >
-                  확인
-                </Button>
-              }
-            />
-
-            <FormControl>
-              <FormLabel htmlFor='password'>비밀번호</FormLabel>
-              <TextField
-                {...register('password')}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                required
-                fullWidth
-                placeholder='••••••'
-                type='password'
-                id='password'
-                autoComplete='new-password'
-                variant='outlined'
-                color={errors.password ? 'error' : 'primary'}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor='passwordConfirm'>비밀번호 확인</FormLabel>
-              <TextField
-                {...register('passwordConfirm')} // 이게 name, onChange 등을 자동으로 추가
-                error={!!errors.passwordConfirm}
-                helperText={errors.passwordConfirm?.message}
-                required
-                fullWidth
-                placeholder='••••••'
-                type='password'
-                id='passwordConfirm'
-                autoComplete='new-password'
-                variant='outlined'
-                color={errors.passwordConfirm ? 'error' : 'primary'}
-              />
-            </FormControl>
-            <Button
-              type='submit'
+          <FormControl>
+            <FormLabel htmlFor='password'>비밀번호</FormLabel>
+            <TextField
+              {...register('password')}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              required
               fullWidth
-              variant='contained'
-              color='info'
-              disabled={!isEmailCodeChecked}
-            >
-              회원가입
-            </Button>
-          </Box>
-          <Divider>
-            <Typography sx={{ color: 'text.secondary' }}>or</Typography>
-          </Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <GoogleButton fullWidth onClick={() => alert('Sign in with Google')}>
-              구글 로그인
-            </GoogleButton>
-            <KakaoButton fullWidth onClick={() => alert('Sign in with 카카오')}>
-              카카오 로그인
-            </KakaoButton>
-            <NaverButton fullWidth onClick={() => alert('Sign in with 네이버')}>
-              네이버 로그인
-            </NaverButton>
-            <Typography sx={{ textAlign: 'center' }}>
-              이미 계정이 있으신가요?{' '}
-              <Link href='/login' variant='body2' sx={{ alignSelf: 'center' }}>
-                로그인
-              </Link>
-            </Typography>
-          </Box>
-        </CardMui>
-      </ContainerMui>
-    </AppTheme>
+              placeholder='••••••'
+              type='password'
+              id='password'
+              autoComplete='new-password'
+              variant='outlined'
+              color={errors.password ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='passwordConfirm'>비밀번호 확인</FormLabel>
+            <TextField
+              {...register('passwordConfirm')} // 이게 name, onChange 등을 자동으로 추가
+              error={!!errors.passwordConfirm}
+              helperText={errors.passwordConfirm?.message}
+              required
+              fullWidth
+              placeholder='••••••'
+              type='password'
+              id='passwordConfirm'
+              autoComplete='new-password'
+              variant='outlined'
+              color={errors.passwordConfirm ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <Button
+            type='submit'
+            fullWidth
+            variant='contained'
+            color='info'
+            disabled={!isEmailCodeChecked}
+          >
+            회원가입
+          </Button>
+        </Box>
+        <Divider>
+          <Typography sx={{ color: 'text.secondary' }}>or</Typography>
+        </Divider>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <GoogleButton fullWidth onClick={() => alert('Sign in with Google')}>
+            구글 로그인
+          </GoogleButton>
+          <KakaoButton fullWidth onClick={() => alert('Sign in with 카카오')}>
+            카카오 로그인
+          </KakaoButton>
+          <NaverButton fullWidth onClick={() => alert('Sign in with 네이버')}>
+            네이버 로그인
+          </NaverButton>
+          <Typography sx={{ textAlign: 'center' }}>
+            이미 계정이 있으신가요?{' '}
+            <Link href='/login' variant='body2' sx={{ alignSelf: 'center' }}>
+              로그인
+            </Link>
+          </Typography>
+        </Box>
+      </CardMui>
+    </ContainerMui>
   );
 }

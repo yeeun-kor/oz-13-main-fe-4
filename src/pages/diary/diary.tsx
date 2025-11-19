@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
-import DiaryCalendar from '../../features/diary/components/DiaryCalendar';
 import { useAuthStore } from '../../features/auth/store/authStore';
 import Chatbot from '../../features/chat/components/Chatbot';
+import DiaryCalendar from '../../features/diary/components/DiaryCalendar';
 
 const Diary = () => {
   const { user } = useAuthStore();

@@ -1,4 +1,3 @@
-import { StyledEngineProvider } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -25,11 +24,9 @@ const queryClient = new QueryClient({
 enableMocking().then(() => {
   createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
-      <StyledEngineProvider injectFirst>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </StyledEngineProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </QueryClientProvider>
   );
 });

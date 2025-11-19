@@ -1,7 +1,7 @@
 // src/features/auth/types/auth.ts
 //===========공통 타입 ============
-export type Gender = '' | 'M' | 'F';
-export type AgeGroup = '' | 'ten' | 'twenty' | 'thirty' | 'fourthy' | 'fifth' | 'sixth';
+export type Gender = '' | 'M' | 'W';
+export type AgeGroup = '' | '10' | '20' | '30' | '40' | '50' | '60';
 
 export type User = {
   id: number;
@@ -9,7 +9,7 @@ export type User = {
   name: string;
   nickname: string;
   gender: Gender;
-  age: AgeGroup;
+  age_group: AgeGroup;
   is_verified: boolean;
   favorite_regions?: string[]; // 마이페이지 조회 시에만 포함
   created_at: string;
@@ -54,7 +54,7 @@ export type RequestSignUpDTO = {
   password: string;
   nickname: string;
   gender: Gender;
-  age: AgeGroup;
+  age_group: AgeGroup;
 };
 
 export type ResponsetSignUpDTO = ApiResponse<{
@@ -111,13 +111,13 @@ export type RequestProfileUpdateDTO = {
   nickname?: string;
   email?: string;
   gender?: Gender; // ✅ 사용
-  age?: AgeGroup; // ✅ 사용
+  age_group?: AgeGroup; // ✅ 사용
 };
 
 export type ResponseProfileUpdateDTO = ApiResponse;
 //=========== 비밀번호 변경(새로덮는것임) ============
 export type RequestPasswordChangeDTO = {
-  old_password: string;
+  current_password: string;
   new_password: string;
   new_password_confirm: string;
 };
@@ -128,3 +128,24 @@ export type ResponsePasswordChangeDTO = ApiResponse;
 export type ResponseDeleteAccountDTO = ApiResponse<{
   deleted: boolean;
 }>;
+
+//==================== 소셜 로그인 ====================
+export type SocialProvider = 'kakao' | 'naver' | 'google';
+
+export type RequestSocialLoginDTO = {
+  token: string;
+};
+
+export type ResponseSocialLoginDTO = ApiResponse<{
+  user: User;
+}>;
+
+//==================== 소셜 계정 연결 ====================
+export type RequestSocialLinkDTO = {
+  token: string;
+};
+
+export type ResponseSocialLinkDTO = ApiResponse;
+
+//==================== 소셜 계정 연결 해제 ====================
+export type ResponseSocialUnlinkDTO = ApiResponse;

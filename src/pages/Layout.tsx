@@ -12,9 +12,13 @@ export default function Layout() {
   const shouldShowChatbot = user && chatbotPages.includes(location.pathname);
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header />
-      <Outlet />
+      <main style={{ flex: 1 }}>
+        {' '}
+        {/* 컨텐츠 영역이 남은 공간 차지 */}
+        <Outlet />
+      </main>
       <Footer />
       {shouldShowChatbot && <Chatbot />}
     </div>

@@ -30,7 +30,7 @@ export const useMypageForm = () => {
       nickname: '',
       email: '',
       gender: '',
-      age: '',
+      age_group: '',
       emailCode: '',
     },
   });
@@ -43,10 +43,10 @@ export const useMypageForm = () => {
         nickname: data.data?.nickname,
         email: data.data?.email,
         gender: data.data?.gender,
-        age: data.data?.age,
+        age_group: data.data?.age_group,
       });
     }
-  }, [data, form.reset]);
+  }, [data]);
 
   //프로필 수정 핸들러
   const handleProfileSubmit = (
@@ -54,19 +54,29 @@ export const useMypageForm = () => {
     onSuccess: () => void,
     onError: (message: string) => void
   ) => {
+    console.log('🔍 handleProfileSubmit 호출됨');
+    console.log('📝 전송할 데이터:', {
+      nickname: formData.nickname,
+      email: formData.email,
+      gender: formData.gender,
+      age_group: formData.age_group,
+    });
+
     updateProfileMutation.mutate(
       {
         nickname: formData.nickname,
         email: formData.email,
         gender: formData.gender,
-        age: formData.age,
+        age_group: formData.age_group,
       },
       {
         onSuccess: () => {
+          console.log('✅ 프로필 수정 성공');
           queryClient.invalidateQueries({ queryKey: ['me'] });
           onSuccess();
         },
         onError: (error) => {
+          console.error('❌ 프로필 수정 실패:', error);
           onError(error.message);
         },
       }

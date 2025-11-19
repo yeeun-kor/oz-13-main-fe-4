@@ -85,7 +85,6 @@ export default function ProfileSection({ isEditMode, onEditModeChange }: Profile
             autoComplete='name'
             fullWidth
             id='name'
-            placeholder='홍길동'
             name='name'
             type='name'
             size='medium'
@@ -142,7 +141,7 @@ export default function ProfileSection({ isEditMode, onEditModeChange }: Profile
             render={({ field }) => (
               <RadioGroup row {...field}>
                 <FormControlLabel
-                  value='F'
+                  value='W'
                   label='여성'
                   control={<Radio disabled={!isEditMode} />}
                 />
@@ -158,18 +157,18 @@ export default function ProfileSection({ isEditMode, onEditModeChange }: Profile
 
         <FormGrid flex={1}>
           <FormControl>
-            <FormLabel htmlFor='named-select'>연령대</FormLabel>
+            <FormLabel htmlFor='age_group'>연령대</FormLabel>
             <Controller
-              name='age'
+              name='age_group'
               control={control}
               render={({ field }) => (
-                <Select {...field} disabled={!isEditMode} id='named-select'>
-                  <MenuItem value={'ten'}>10대</MenuItem>
-                  <MenuItem value={'twenty'}>20대</MenuItem>
-                  <MenuItem value={'thirty'}>30대</MenuItem>
-                  <MenuItem value={'fourthy'}>40대</MenuItem>
-                  <MenuItem value={'fifth'}>50대</MenuItem>
-                  <MenuItem value={'sixth'}>60대</MenuItem>
+                <Select {...field} disabled={!isEditMode} id='age_group'>
+                  <MenuItem value={'10'}>10대</MenuItem>
+                  <MenuItem value={'20'}>20대</MenuItem>
+                  <MenuItem value={'30'}>30대</MenuItem>
+                  <MenuItem value={'40'}>40대</MenuItem>
+                  <MenuItem value={'50'}>50대</MenuItem>
+                  <MenuItem value={'60'}>60대</MenuItem>
                 </Select>
               )}
             />

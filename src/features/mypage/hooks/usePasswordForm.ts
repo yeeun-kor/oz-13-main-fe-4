@@ -11,7 +11,7 @@ export const usePasswordForm = () => {
     resolver: zodResolver(passwordSchema),
     mode: 'onChange',
     defaultValues: {
-      oldPassword: '',
+      currentPassword: '',
       newPassword: '',
       newPasswordConfirm: '',
     },
@@ -24,7 +24,7 @@ export const usePasswordForm = () => {
   ) => {
     updatePasswordMutation.mutate(
       {
-        old_password: formData.oldPassword,
+        current_password: formData.currentPassword,
         new_password: formData.newPassword,
         new_password_confirm: formData.newPasswordConfirm,
       },
