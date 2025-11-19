@@ -7,6 +7,8 @@ export interface Message {
 
 export interface ReqSendMessage {
   message: string;
+  lat: number;
+  lon: number;
 }
 
 export interface ResSendMessage {

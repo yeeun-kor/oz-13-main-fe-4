@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Message } from '../types/chat';
 import { useSendMessage, useChatHistory } from '../hooks/useChatQueries';
+import { useCurrentLocation } from '../../../hooks/useCurrentLocation';
 
 const KEYWORDS = ['서비스 소개', '추천 옷차림', '이번주 날씨'];
 const CHAT_SESSION_KEY = 'chat-session-id';
@@ -27,6 +28,7 @@ const Chatbot = () => {
   const chatRef = useRef<HTMLDivElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const sendMessage = useSendMessage();
+  const { location, fetchLocation } = useCurrentLocation();
 
   // localStorage에서 session_id 가져오기
   const [sessionId, setSessionId] = useState<string | null>(() => {
@@ -96,8 +98,9 @@ const Chatbot = () => {
 
     const currentMessage = trimmedMessage;
 
+    const userMessageId = Date.now();
     const userMessage: Message = {
-      id: Date.now(),
+      id: userMessageId,
       role: 'user',
       text: currentMessage,
     };
@@ -105,16 +108,24 @@ const Chatbot = () => {
     setMessage('');
 
     try {
-      const response = await sendMessage.mutateAsync({
+      // 위치 정보 가져오기
+      await fetchLocation();
+
+      const requestData = {
         message: currentMessage,
-      });
+        lat: location?.lat ?? 0,
+        lon: location?.lon ?? 0,
+      };
+      console.log('메시지 전송 데이터:', requestData);
+
+      const response = await sendMessage.mutateAsync(requestData);
 
       if (response.session_id) {
         setSessionId(response.session_id);
       }
 
       const botMessage: Message = {
-        id: Date.now(),
+        id: userMessageId + 1,
         role: 'ai',
         text: response.response,
         created_at: response.created_at,
@@ -123,7 +134,7 @@ const Chatbot = () => {
     } catch (error) {
       // 에러 발생 시 안내 메시지 표시
       const errorMessage: Message = {
-        id: Date.now(),
+        id: userMessageId + 2,
         role: 'ai',
         text: '죄송합니다. 메시지 전송 중 오류가 발생했습니다. 다시 시도해주세요.',
       };
@@ -152,9 +163,17 @@ const Chatbot = () => {
     }
 
     try {
-      const response = await sendMessage.mutateAsync({
+      // 위치 정보 가져오기
+      await fetchLocation();
+
+      const requestData = {
         message: keyword,
-      });
+        lat: location?.lat ?? 0,
+        lon: location?.lon ?? 0,
+      };
+      console.log('키워드 전송 데이터:', requestData);
+
+      const response = await sendMessage.mutateAsync(requestData);
 
       if (response.session_id) {
         setSessionId(response.session_id);
