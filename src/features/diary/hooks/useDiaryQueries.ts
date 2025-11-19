@@ -13,27 +13,26 @@ export const useCreateDiary = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ diary, image }: { diary: DiaryData; image: File | null }) =>
-      postDiaryApi(diary, image),
-    onSuccess: (response, variables) => {
+    mutationFn: ({
+      diary,
+      image,
+      lat,
+      lon,
+    }: {
+      diary: DiaryData;
+      image: File | null;
+      lat?: number;
+      lon?: number;
+    }) => postDiaryApi(diary, image, lat, lon),
+    onSuccess: (response) => {
       console.log('일기 작성 성공 : ', response);
 
-      const diaryId = response.diary_id || response.id;
-
+      // 서버 응답을 그대로 사용 (weather 정보 포함)
       queryClient.setQueriesData<DiaryData[]>({ queryKey: ['diary', 'calendar'] }, (oldData) => {
         if (!oldData) return oldData;
 
-        const newDiary: DiaryData = {
-          id: diaryId,
-          date: variables.diary.date,
-          title: variables.diary.title,
-          emotion: variables.diary.emotion,
-          notes: variables.diary.notes,
-          weather: variables.diary.weather,
-          image_url: null,
-        };
-
-        return [...oldData, newDiary];
+        // 서버에서 받은 전체 응답을 사용
+        return [...oldData, response];
       });
 
       // 전체 재조회 (서버에서 정확한 데이터 가져옴)
@@ -74,14 +73,13 @@ export const useEditDiary = () => {
     mutationFn: ({ id, diary, image }: { id: number; diary: DiaryData; image: File | null }) =>
       patchDiaryApi(diary, id, image),
     onSuccess: (updatedDiary: DiaryData) => {
-      // calendar 데이터 즉시 업데이트 -> 네트워크 요청 없음
-      queryClient.setQueriesData<DiaryData[]>({ queryKey: ['diary', 'calendar'] }, (oldData) => {
-        if (!oldData) return oldData;
-        return oldData.map((diary) => (diary.id === updatedDiary.id ? updatedDiary : diary));
-      });
+      console.log('일기 수정 성공:', updatedDiary);
 
-      // detail은 서버에서 정확한 데이터 다시 조회
-      queryClient.invalidateQueries({ queryKey: ['diary', 'detail', updatedDiary.id] });
+      // 모든 calendar 캐시 무효화 (year, month와 상관없이 모든 캘린더 새로고침)
+      queryClient.invalidateQueries({ queryKey: ['diary', 'calendar'] });
+
+      // detail 캐시도 업데이트
+      queryClient.setQueryData(['diary', 'detail', updatedDiary.id], updatedDiary);
     },
     onError: (error: Error) => {
       console.log('일기 수정 실패 : ', error.message);

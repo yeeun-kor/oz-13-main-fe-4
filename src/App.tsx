@@ -6,6 +6,7 @@ import Layout from './pages/Layout';
 import { MainPage } from './pages/main/MainPage';
 import Mypage from './pages/Mypage';
 import Diary from './pages/diary/diary';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -19,7 +20,14 @@ function App() {
         <Route path='/login' element={<LogIn />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/mypage' element={<Mypage />} />
-        <Route path='/diary' element={<Diary />} />
+        <Route
+          path='/diary'
+          element={
+            <ProtectedRoute>
+              <Diary />
+            </ProtectedRoute>
+          }
+        />
       </Route>
     </Routes>
   );

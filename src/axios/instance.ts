@@ -10,6 +10,7 @@ export const instance = axios.create({
 export const diaryInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 5000,
+  withCredentials: true,
 });
 
 //로그인시 유효성 검사 메세지는 숨겨

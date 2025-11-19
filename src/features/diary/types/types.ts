@@ -8,12 +8,23 @@ export interface DiaryData {
   title: string;
   emotion: Emotion;
   notes: string;
-  weather: {
-    condition: string;
+  weather?: {
+    id: number;
+    base_time: string;
+    valid_time: string;
     temperature: number;
-    icon: number;
+    feels_like: number;
+    humidity: number;
+    rain_probability: number;
+    rain_volume: number;
+    wind_speed: number;
+    condition: string;
+    icon: string;
   };
-  image_url: string | null;
+  icon?: string;
+  image: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface DiaryDataReq {
@@ -23,7 +34,7 @@ export interface DiaryDataReq {
   notes: string;
   lon: string;
   lat: string;
-  image_url: File | null;
+  image: File | null;
 }
 
 export interface DiaryModalProps {

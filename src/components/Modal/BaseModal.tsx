@@ -20,17 +20,39 @@ const overlayStyle = css`
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
   z-index: 10;
 `;
 
 const modalStyle = css`
   margin-top: 60px;
+  margin-bottom: 60px;
   background: white;
   border-radius: 8px;
   padding: 24px;
   max-width: 400px;
   width: 90%;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
 `;
 
 const titleStyle = css`

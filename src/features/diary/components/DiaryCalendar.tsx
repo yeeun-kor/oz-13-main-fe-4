@@ -21,6 +21,7 @@ const DiaryCalendar = () => {
 
   // 특정 날짜의 일기를 찾는 함수
   const getDiaryByDate = (year: number, month: number, date: number) => {
+    if (!diaries || !Array.isArray(diaries)) return;
     const padMonth = String(month + 1).padStart(2, '0');
     const padDate = String(date).padStart(2, '0');
     const targetDate = `${year}-${padMonth}-${padDate}`;

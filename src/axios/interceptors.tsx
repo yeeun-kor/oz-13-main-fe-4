@@ -38,7 +38,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
   });
 
   //- 응답인터셉터(instance 기반으로 동작)
-  instance.interceptors.response.use(
+  axiosInstance.interceptors.response.use(
     (response) => {
       // 성공적인 응답은 그대로 반환
       return response;
