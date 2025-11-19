@@ -1,9 +1,15 @@
 // features/mypage/types/mypage.types.ts
 
+import { UseFormReturn } from 'react-hook-form';
+import { MyPageFormData } from '../../auth/types/zodTypes';
+
 // 섹션별 Props 타입
 export interface ProfileSectionProps {
   isEditMode: boolean;
   onEditModeChange: (mode: boolean) => void;
+  form: UseFormReturn<MyPageFormData>;
+  validationState: ValidationState;
+  updateValidation: (key: keyof ValidationState, value: boolean) => void;
 }
 
 export interface EmailSectionProps {

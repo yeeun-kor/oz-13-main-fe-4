@@ -13,22 +13,19 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 import BaseModal from '../../../components/Modal/BaseModal';
 import { useNicknameValidateMutation } from '../../auth/hooks/useNicknameValidateMutation';
-import { useMypageForm } from '../hooks/useMypageForm';
 import { ProfileSectionProps } from '../types/mypage.types';
 
-const FormGrid = styled(Grid)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-}));
-
-export default function ProfileSection({ isEditMode, onEditModeChange }: ProfileSectionProps) {
-  const { form, validationState, updateValidation, resetValidation } = useMypageForm();
+export default function ProfileSection({
+  isEditMode,
+  onEditModeChange,
+  form,
+  validationState,
+  updateValidation,
+}: ProfileSectionProps) {
   const {
     register,
     control,
@@ -73,38 +70,32 @@ export default function ProfileSection({ isEditMode, onEditModeChange }: Profile
         </Typography>
       </Divider>
 
-      <Stack
-        component='section'
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={{ xs: 1, sm: 2, md: 4 }}
-      >
-        <FormGrid>
+      <BaseModal
+        isOpen={nicknameShowModal}
+        onClose={() => setNicknameShowModal(false)}
+        title='닉네임 중복 확인'
+        subtitle={modalMessage}
+        footer={
+          <Button onClick={() => setNicknameShowModal(false)} variant='contained' type='button'>
+            확인
+          </Button>
+        }
+      />
+
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: '100%' }}>
+        <FormControl fullWidth>
           <FormLabel htmlFor='name'>이름</FormLabel>
           <TextField
             {...register('name')}
             autoComplete='name'
             fullWidth
             id='name'
-            name='name'
-            type='name'
-            size='medium'
+            placeholder='홍길동'
             disabled
           />
-        </FormGrid>
+        </FormControl>
 
-        <BaseModal
-          isOpen={nicknameShowModal}
-          onClose={() => setNicknameShowModal(false)}
-          title='닉네임 중복 확인'
-          subtitle={modalMessage}
-          footer={
-            <Button onClick={() => setNicknameShowModal(false)} variant='contained' type='button'>
-              확인
-            </Button>
-          }
-        />
-
-        <FormGrid>
+        <FormControl fullWidth>
           <FormLabel htmlFor='nickname'>닉네임</FormLabel>
           <Stack direction='row' spacing={1}>
             <TextField
@@ -114,11 +105,8 @@ export default function ProfileSection({ isEditMode, onEditModeChange }: Profile
               disabled={!isEditMode}
               id='nickname'
               placeholder='동해번쩍 서해번쩍'
-              name='nickname'
-              type='name'
               fullWidth
-              autoComplete='name'
-              size='medium'
+              color={errors.nickname ? 'error' : 'primary'}
             />
             <Button
               variant='contained'
@@ -131,49 +119,49 @@ export default function ProfileSection({ isEditMode, onEditModeChange }: Profile
               중복확인
             </Button>
           </Stack>
-        </FormGrid>
+        </FormControl>
+      </Stack>
 
-        <FormGrid size={{ xs: 12 }}>
-          <FormLabel>성별</FormLabel>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: '100%' }}>
+        <FormControl sx={{ flex: 1 }}>
+          <FormLabel htmlFor='gender'>성별</FormLabel>
           <Controller
             name='gender'
             control={control}
             render={({ field }) => (
-              <RadioGroup row {...field}>
-                <FormControlLabel
-                  value='W'
-                  label='여성'
-                  control={<Radio disabled={!isEditMode} />}
-                />
+              <RadioGroup {...field} row css={{ justifyContent: 'space-around' }}>
                 <FormControlLabel
                   value='M'
-                  label='남성'
                   control={<Radio disabled={!isEditMode} />}
+                  label='남자'
+                />
+                <FormControlLabel
+                  value='W'
+                  control={<Radio disabled={!isEditMode} />}
+                  label='여자'
                 />
               </RadioGroup>
             )}
           />
-        </FormGrid>
+        </FormControl>
 
-        <FormGrid flex={1}>
-          <FormControl>
-            <FormLabel htmlFor='age_group'>연령대</FormLabel>
-            <Controller
-              name='age_group'
-              control={control}
-              render={({ field }) => (
-                <Select {...field} disabled={!isEditMode} id='age_group'>
-                  <MenuItem value={'10'}>10대</MenuItem>
-                  <MenuItem value={'20'}>20대</MenuItem>
-                  <MenuItem value={'30'}>30대</MenuItem>
-                  <MenuItem value={'40'}>40대</MenuItem>
-                  <MenuItem value={'50'}>50대</MenuItem>
-                  <MenuItem value={'60'}>60대</MenuItem>
-                </Select>
-              )}
-            />
-          </FormControl>
-        </FormGrid>
+        <FormControl sx={{ flex: 1 }}>
+          <FormLabel htmlFor='age_group'>연령대</FormLabel>
+          <Controller
+            name='age_group'
+            control={control}
+            render={({ field }) => (
+              <Select {...field} disabled={!isEditMode} id='age_group'>
+                <MenuItem value={'10'}>10대</MenuItem>
+                <MenuItem value={'20'}>20대</MenuItem>
+                <MenuItem value={'30'}>30대</MenuItem>
+                <MenuItem value={'40'}>40대</MenuItem>
+                <MenuItem value={'50'}>50대</MenuItem>
+                <MenuItem value={'60'}>60대</MenuItem>
+              </Select>
+            )}
+          />
+        </FormControl>
       </Stack>
     </Stack>
   );

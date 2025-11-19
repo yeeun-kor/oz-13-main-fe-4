@@ -189,44 +189,52 @@ export default function SignUp() {
           sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
           onSubmit={handleSubmit(onSubmit)}
         >
-          <FormControl fullWidth>
-            <FormLabel htmlFor='name'>이름</FormLabel>
-            <TextField
-              {...register('name')}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-              autoComplete='name'
-              fullWidth
-              id='name'
-              placeholder='홍길동'
-              color={errors.name ? 'error' : 'primary'}
-            />
-          </FormControl>
-          <FormControl fullWidth>
-            <FormLabel htmlFor='nickname'>닉네임</FormLabel>
-            <Stack direction='row' spacing={1}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{
+              width: '100%',
+            }}
+          >
+            <FormControl fullWidth>
+              <FormLabel htmlFor='name'>이름</FormLabel>
               <TextField
-                {...register('nickname')}
-                error={!!errors.nickname}
-                helperText={errors.nickname?.message}
+                {...register('name')}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                autoComplete='name'
                 fullWidth
-                id='nickname'
-                placeholder='동해번쩍 서해번쩍'
-                color={errors.nickname ? 'error' : 'primary'}
-                disabled={isNicknameValidated} // 추가
+                id='name'
+                placeholder='홍길동'
+                color={errors.name ? 'error' : 'primary'}
               />
-              <Button
-                variant='contained'
-                color='info'
-                onClick={handleNicknameValidate}
-                disabled={isNicknameValidated}
-                type='button'
-                sx={{ minWidth: 'fit-content', whiteSpace: 'nowrap' }}
-              >
-                중복확인
-              </Button>
-            </Stack>
-          </FormControl>
+            </FormControl>
+            <FormControl fullWidth>
+              <FormLabel htmlFor='nickname'>닉네임</FormLabel>
+              <Stack direction='row' spacing={1}>
+                <TextField
+                  {...register('nickname')}
+                  error={!!errors.nickname}
+                  helperText={errors.nickname?.message}
+                  fullWidth
+                  id='nickname'
+                  placeholder='동해번쩍 서해번쩍'
+                  color={errors.nickname ? 'error' : 'primary'}
+                  disabled={isNicknameValidated} // 추가
+                />
+                <Button
+                  variant='contained'
+                  color='info'
+                  onClick={handleNicknameValidate}
+                  disabled={isNicknameValidated}
+                  type='button'
+                  sx={{ minWidth: 'fit-content', whiteSpace: 'nowrap' }}
+                >
+                  중복확인
+                </Button>
+              </Stack>
+            </FormControl>
+          </Stack>
 
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
@@ -269,29 +277,72 @@ export default function SignUp() {
 
           <FormControl>
             <FormLabel htmlFor='email'>이메일</FormLabel>
-            <TextField
-              {...register('email')}
-              disabled={isEmailVerified}
-              fullWidth
-              id='email'
-              placeholder='your@email.com'
-              autoComplete='email'
-              variant='outlined'
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              color={errors.email ? 'error' : 'primary'}
-            />
-            <Button
-              variant='contained'
-              color='success'
-              type='button'
-              onClick={handleEmailValidate}
-              disabled={isEmailVerified}
-            >
-              인증코드 보내기
-            </Button>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 4 }}>
+              <TextField
+                {...register('email')}
+                disabled={isEmailVerified}
+                id='email'
+                placeholder='your@email.com'
+                autoComplete='email'
+                variant='outlined'
+                error={!!errors.email}
+                fullWidth
+                helperText={errors.email?.message}
+                color={errors.email ? 'error' : 'primary'}
+              />
+              <Button
+                variant='contained'
+                color='success'
+                type='button'
+                onClick={handleEmailValidate}
+                disabled={isEmailVerified}
+                sx={{ minWidth: 'fit-content', whiteSpace: 'nowrap' }}
+              >
+                인증확인
+              </Button>
+            </Stack>
           </FormControl>
 
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{
+              width: '100%',
+            }}
+          >
+            <FormControl fullWidth>
+              <FormLabel htmlFor='password'>비밀번호</FormLabel>
+              <TextField
+                {...register('password')}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                required
+                fullWidth
+                placeholder='••••••'
+                type='password'
+                id='password'
+                autoComplete='new-password'
+                variant='outlined'
+                color={errors.password ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <FormControl fullWidth>
+              <FormLabel htmlFor='passwordConfirm'>비밀번호 확인</FormLabel>
+              <TextField
+                {...register('passwordConfirm')}
+                error={!!errors.passwordConfirm}
+                helperText={errors.passwordConfirm?.message}
+                required
+                fullWidth
+                placeholder='••••••'
+                type='password'
+                id='passwordConfirm'
+                autoComplete='new-password'
+                variant='outlined'
+                color={errors.passwordConfirm ? 'error' : 'primary'}
+              />
+            </FormControl>
+          </Stack>
           {isEmailVerified ? (
             <FormControl>
               <FormLabel htmlFor='emailCode'>이메일 인증코드</FormLabel>
@@ -337,38 +388,6 @@ export default function SignUp() {
             }
           />
 
-          <FormControl>
-            <FormLabel htmlFor='password'>비밀번호</FormLabel>
-            <TextField
-              {...register('password')}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              required
-              fullWidth
-              placeholder='••••••'
-              type='password'
-              id='password'
-              autoComplete='new-password'
-              variant='outlined'
-              color={errors.password ? 'error' : 'primary'}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor='passwordConfirm'>비밀번호 확인</FormLabel>
-            <TextField
-              {...register('passwordConfirm')} // 이게 name, onChange 등을 자동으로 추가
-              error={!!errors.passwordConfirm}
-              helperText={errors.passwordConfirm?.message}
-              required
-              fullWidth
-              placeholder='••••••'
-              type='password'
-              id='passwordConfirm'
-              autoComplete='new-password'
-              variant='outlined'
-              color={errors.passwordConfirm ? 'error' : 'primary'}
-            />
-          </FormControl>
           <Button
             type='submit'
             fullWidth
@@ -383,15 +402,17 @@ export default function SignUp() {
           <Typography sx={{ color: 'text.secondary' }}>or</Typography>
         </Divider>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <GoogleButton fullWidth onClick={() => alert('Sign in with Google')}>
-            구글 로그인
-          </GoogleButton>
-          <KakaoButton fullWidth onClick={() => alert('Sign in with 카카오')}>
-            카카오 로그인
-          </KakaoButton>
-          <NaverButton fullWidth onClick={() => alert('Sign in with 네이버')}>
-            네이버 로그인
-          </NaverButton>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2, md: 4 }}>
+            <GoogleButton fullWidth onClick={() => alert('Sign in with Google')}>
+              구글 로그인
+            </GoogleButton>
+            <KakaoButton fullWidth onClick={() => alert('Sign in with 카카오')}>
+              카카오 로그인
+            </KakaoButton>
+            <NaverButton fullWidth onClick={() => alert('Sign in with 네이버')}>
+              네이버 로그인
+            </NaverButton>
+          </Stack>
           <Typography sx={{ textAlign: 'center' }}>
             이미 계정이 있으신가요?{' '}
             <Link href='/login' variant='body2' sx={{ alignSelf: 'center' }}>

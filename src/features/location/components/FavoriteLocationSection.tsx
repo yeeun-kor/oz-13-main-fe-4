@@ -32,12 +32,11 @@ const CardSlot = styled(Box)({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  minHeight: '200px',
 });
 
 const AddButton = styled('button')({
-  width: '100px',
-  height: '100px',
+  width: '60px',
+  height: '60px',
   backgroundColor: '#1E3A8A',
   color: '#FFF',
   fontSize: '48px',
@@ -114,29 +113,51 @@ export default function FavoriteLocationSection() {
 
   if (isLoading) return <div>로딩 중...</div>;
 
-  const slots = Array.from({ length: MAX_FAVORITES }, (_, index) => {
-    const favorite = safeFavorites[index];
+  // const slots = Array.from({ length: MAX_FAVORITES }, (_, index) => {
+  //   const favorite = safeFavorites[index];
 
-    if (favorite?.id) {
-      return (
-        <CardSlot key={favorite.id}>
-          <FavoriteLocationCard
-            favorite={favorite}
-            onAliasUpdate={handleAliasUpdate}
-            onDelete={handleDelete}
-          />
-        </CardSlot>
-      );
-    } else if (index === safeFavorites.length && safeFavorites.length < MAX_FAVORITES) {
-      return (
-        <CardSlot key={`add-${index}`}>
-          <AddButton onClick={handleAddClick}>+</AddButton>
-        </CardSlot>
-      );
-    } else {
-      return <CardSlot key={`empty-${index}`} />;
-    }
-  });
+  //   if (favorite?.id) {
+  //     return (
+  //       <CardSlot key={favorite.id}>
+  //         <FavoriteLocationCard
+  //           favorite={favorite}
+  //           onAliasUpdate={handleAliasUpdate}
+  //           onDelete={handleDelete}
+  //         />
+  //       </CardSlot>
+  //     );
+  //   } else if (index === safeFavorites.length && safeFavorites.length < MAX_FAVORITES) {
+  //     return (
+  //       <CardSlot key={`add-${index}`}>
+  //         <AddButton onClick={handleAddClick}>+</AddButton>
+  //       </CardSlot>
+  //     );
+  //   } else {
+  //     return <CardSlot key={`empty-${index}`} />;
+  //   }
+  // });
+
+  // 기존 MAX_FAVORITES 기반 slots 배열 생성 대신
+  const slots = [
+    // 실제 즐겨찾기 카드들
+    ...safeFavorites.map((favorite) => (
+      <CardSlot key={favorite.id}>
+        <FavoriteLocationCard
+          favorite={favorite}
+          onAliasUpdate={handleAliasUpdate}
+          onDelete={handleDelete}
+        />
+      </CardSlot>
+    )),
+    // 추가 버튼 (3개 미만일 때만)
+    ...(safeFavorites.length < MAX_FAVORITES
+      ? [
+          <CardSlot key='add-button'>
+            <AddButton onClick={handleAddClick}>+</AddButton>
+          </CardSlot>,
+        ]
+      : []),
+  ];
 
   const validFavorites = safeFavorites.filter((f) => f?.id);
 

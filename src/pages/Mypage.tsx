@@ -17,7 +17,15 @@ export default function Mypage() {
   const [modalTitle, setModalTitle] = useState('');
   const navigate = useNavigate();
 
-  const { form, handleProfileSubmit, resetValidation, isLoading, error } = useMypageForm();
+  const {
+    form,
+    handleProfileSubmit,
+    resetValidation,
+    validationState,
+    updateValidation,
+    isLoading,
+    error,
+  } = useMypageForm();
 
   // 로딩 중일 때
   if (isLoading) {
@@ -29,33 +37,23 @@ export default function Mypage() {
     return <div>에러 발생</div>;
   }
 
-  const onSubmit = form.handleSubmit(
-    (data) => {
-      console.log('🚀 onSubmit 호출됨');
-      console.log('📋 폼 데이터:', data);
-      handleProfileSubmit(
-        data,
-        () => {
-          setModalTitle('회원정보 수정');
-          setModalMessage('마이페이지 수정 완료');
-          setShowModal(true);
-          setIsEditMode(false);
-        },
-        (message) => {
-          setModalTitle('회원정보 수정 오류');
-          setModalMessage(message);
-          setShowModal(true);
-        }
-      );
-    },
-    (errors) => {
-      console.error('❌ 폼 유효성 검사 실패:', errors);
-      console.log('현재 폼 값:', form.getValues());
-      console.log('에러 상세:', JSON.stringify(errors, null, 2));
-    }
-  );
+  const onSubmit = form.handleSubmit((data) => {
+    handleProfileSubmit(
+      data,
+      () => {
+        setModalTitle('회원정보 수정');
+        setModalMessage('마이페이지 수정 완료');
+        setShowModal(true);
+        setIsEditMode(false);
+      },
+      (message) => {
+        setModalTitle('회원정보 수정 오류');
+        setModalMessage(message);
+        setShowModal(true);
+      }
+    );
+  });
   const handleDelete = () => {
-    console.log('UserDelegte');
     navigate('/signup');
   };
   return (
@@ -131,7 +129,13 @@ export default function Mypage() {
           </Box>
 
           {/* 회원정보 섹션 */}
-          <ProfileSection isEditMode={isEditMode} onEditModeChange={setIsEditMode} />
+          <ProfileSection
+            isEditMode={isEditMode}
+            onEditModeChange={setIsEditMode}
+            form={form}
+            validationState={validationState}
+            updateValidation={updateValidation}
+          />
 
           {/* 이메일 변경 섹션 */}
           <EmailSection isEditMode={isEditMode} />
@@ -160,6 +164,8 @@ export default function Mypage() {
 
         {/* 즐겨찾는 지역 섹션 */}
         <FavoriteLocationSection />
+
+        {/* 회원탈퇴 */}
         <Divider sx={{ my: 4 }} />
         <Stack sx={{ alignItems: 'end' }}>
           <Button
