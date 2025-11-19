@@ -1,53 +1,53 @@
-// hooks/useFavoriteLocations.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { locationApi } from '../api/locationApi';
-import { CreateFavoriteRequest, ReorderRequest } from '../types/location';
+import {
+  getFavorites,
+  addFavorite,
+  deleteFavorite,
+  updateFavoriteAlias,
+  reorderFavorites,
+  AddFavoriteRequest,
+  ReorderRequest,
+} from '../../favorite/api/favoriteAPI';
+import { useAuthStore } from '../../auth/store/authStore';
 
 export const useFavoriteLocations = () => {
   const queryClient = useQueryClient();
+  const { access } = useAuthStore();
 
-  // 목록 조회
   const {
     data: favorites = [],
     isLoading,
     error,
   } = useQuery({
     queryKey: ['favoriteLocations'],
-    queryFn: async () => {
-      const response = await locationApi.getFavorites();
-      return response.data;
-    },
+    queryFn: getFavorites,
+    enabled: !!access,
   });
-  console.log('favorites 상태:', favorites);
-  console.log('error:', error);
-  // 추가
+
   const addMutation = useMutation({
-    mutationFn: (data: CreateFavoriteRequest) => locationApi.addFavorite(data),
+    mutationFn: addFavorite,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['favoriteLocations'] });
     },
   });
 
-  // 삭제
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => locationApi.deleteFavorite(id),
+    mutationFn: deleteFavorite,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['favoriteLocations'] });
     },
   });
 
-  // 별칭 변경
   const updateAliasMutation = useMutation({
     mutationFn: ({ id, alias }: { id: number; alias: string }) =>
-      locationApi.updateAlias(id, { alias }),
+      updateFavoriteAlias(id, { alias }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['favoriteLocations'] });
     },
   });
 
-  // 순서 변경
   const reorderMutation = useMutation({
-    mutationFn: (data: ReorderRequest[]) => locationApi.reorderFavorites(data),
+    mutationFn: reorderFavorites,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['favoriteLocations'] });
     },
@@ -56,6 +56,7 @@ export const useFavoriteLocations = () => {
   return {
     favorites,
     isLoading,
+    error,
     addFavorite: addMutation.mutate,
     deleteFavorite: deleteMutation.mutate,
     updateAlias: updateAliasMutation.mutate,

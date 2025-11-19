@@ -10,45 +10,36 @@ import {
   MainRecommendation,
   RecommendationCard,
 } from '../styles/AIRecommendationStyles';
+import { useCurrentWeather } from '../hooks/useCurrentWeather';
+import { useLocationStore } from '../../location/store/locationStore';
 
-interface AIRecommendationProps {
-  temperature: number;
-  condition: string;
-  location: string;
-  humidity?: number;
-  windSpeed?: number;
-}
-
-export const AIRecommendation = ({
-  temperature,
-  condition,
-  location,
-  humidity,
-  windSpeed,
-}: AIRecommendationProps) => {
+export const AIRecommendation = () => {
+  const { weather } = useCurrentWeather();
+  const { location } = useLocationStore();
   const [recommendation, setRecommendation] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!weather || !location) return;
+
     const fetchRecommendation = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
         const rec = await getAIRecommendation({
-          temperature,
-          condition,
-          location,
-          humidity,
-          windSpeed,
+          temperature: weather.temperature,
+          condition: weather.condition,
+          location: location,
+          humidity: weather.humidity,
+          windSpeed: weather.wind_speed,
         });
 
         setRecommendation(rec);
       } catch (err) {
         console.error('추천 생성 실패:', err);
         setError('추천을 생성할 수 없습니다.');
-        // 폴백 메시지
         setRecommendation('오늘 하루도 즐거운 시간 보내세요!');
       } finally {
         setIsLoading(false);
@@ -56,16 +47,21 @@ export const AIRecommendation = ({
     };
 
     fetchRecommendation();
-  }, [temperature, condition, location, humidity, windSpeed]);
+  }, [
+    weather?.temperature,
+    weather?.condition,
+    location,
+    weather?.humidity,
+    weather?.wind_speed,
+    weather,
+  ]);
 
   return (
     <RecommendationCard>
-      {/* 좌측 아이콘 */}
       <IconBox>
         <AutoAwesomeIcon sx={{ color: '#3B82F6', fontSize: 48 }} />
       </IconBox>
 
-      {/* 우측 컨텐츠 */}
       <ContentSection>
         <HeaderText>AI가 추천하는 오늘의 활동</HeaderText>
 

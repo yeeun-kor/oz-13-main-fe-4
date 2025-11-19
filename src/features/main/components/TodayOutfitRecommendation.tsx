@@ -3,7 +3,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ThumbUp from '@mui/icons-material/ThumbUp';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { outfitAPI } from '../../recommendation/api/clothingAPI';
+import { outfitAPI } from '../../recommendation/api/outfitAPI';
 import { parseOutfitString } from '../../../utils/clothingParser';
 import {
   NavigationButton,
@@ -17,39 +17,33 @@ import {
   TemperatureInfo,
 } from '../styles/TodayOutfitStyles';
 import { OutfitItemIcon } from './OutfitItemIcon';
+import { useCurrentWeather } from '../hooks/useCurrentWeather';
+import { useLocationStore } from '../../location/store/locationStore';
+import { useCurrentOutfit } from '../hooks/useCurrentOutfit';
 
-interface TodayOutfitRecommendationProps {
-  temperature: number;
-  outfits?: Array<{
-    id: string;
-    imageUrl?: string;
-    type: string;
-  }>;
-}
-
-export const TodayOutfitRecommendation = ({ temperature }: TodayOutfitRecommendationProps) => {
-  // 기본 3개 아이템 생성 (데이터 없을 시)
-  // const displayOutfits = outfits.length > 0 ? outfits : Array(3).fill(null);
+export const TodayOutfitRecommendation = () => {
+  const { weather } = useCurrentWeather();
+  const { latitude, longitude } = useLocationStore();
   const [outfits, setOutfits] = useState<string[]>([]);
   const [explanation, setExplanation] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { outfit } = useCurrentOutfit();
 
-  const lat = 37.5172;
-  const lon = 127.0473;
-  const location = '서울';
   useEffect(() => {
     const fetchRecommendation = async () => {
+      if (!latitude || !longitude) return;
+
       try {
-        // const data = await outfitAPI.getRecommendationByCoords(lat, lon);
-        const data = await outfitAPI.getRecommendationByLocation(location);
-        setOutfits([data.rec_1, data.rec_2, data.rec_3]);
-        setExplanation(data.explanation);
+        if (!outfit) return null;
+        setOutfits([outfit.rec_1, outfit.rec_2, outfit.rec_3]);
+        setExplanation(outfit.explanation);
       } catch (error) {
         console.error('의상 추천 가져오기 실패:', error);
       }
     };
     fetchRecommendation();
-  }, [lat, lon]);
+  }, [latitude, longitude, outfit]);
+
   const handlePrevious = () => {
     setSelectedIndex((prev) => (prev === 0 ? outfits.length - 1 : prev - 1));
   };
@@ -57,9 +51,11 @@ export const TodayOutfitRecommendation = ({ temperature }: TodayOutfitRecommenda
   const handleNext = () => {
     setSelectedIndex((prev) => (prev === outfits.length - 1 ? 0 : prev + 1));
   };
-  if (outfits.length === 0) return null;
+
+  if (outfits.length === 0 || !weather) return null;
 
   const items = parseOutfitString(outfits[selectedIndex]);
+
   return (
     <OutfitCard>
       <OutfitHeader>
@@ -67,12 +63,11 @@ export const TodayOutfitRecommendation = ({ temperature }: TodayOutfitRecommenda
           <ThumbUp sx={{ color: '#5B9EFF', fontSize: 28 }} />
           <OutfitTitle>오늘의 추천 코디</OutfitTitle>
         </Box>
-        <TemperatureInfo>{temperature}°C 맞춤</TemperatureInfo>
+        <TemperatureInfo>{Math.round(weather.temperature)}°C 맞춤</TemperatureInfo>
       </OutfitHeader>
 
       <StyleLabel>{explanation}</StyleLabel>
       <OutfitGridContainer>
-        {/* 왼쪽 화살표 */}
         <NavigationButton onClick={handlePrevious} aria-label='이전 코디'>
           <ChevronLeftIcon sx={{ fontSize: 32 }} />
         </NavigationButton>

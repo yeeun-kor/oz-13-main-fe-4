@@ -9,23 +9,21 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
 import { FavoriteLocation } from '../../favorite/api/favoriteAPI';
+import { useCurrentWeatherByLocation } from '../hooks/useCurrentWeatherByLocation';
 
 interface FavoriteLocationCardProps {
   favorite: FavoriteLocation;
-  isSelected: boolean;
-  temperature: number;
-  precipitationProbability: number;
-  feelsLike: number;
+  selected: boolean;
   onClick: () => void;
   onAliasUpdate: (id: number, alias: string) => void;
   onDelete: (id: number) => void;
 }
 
-const CardContainer = styled(Box)<{ isSelected: boolean }>(({ isSelected }) => ({
+const CardContainer = styled(Box)<{ selected: boolean }>(({ selected }) => ({
   width: '20rem',
   flexShrink: 0,
-  backgroundColor: isSelected ? '#E3F2FD' : '#FFF',
-  border: isSelected ? '3px solid #1976D2' : '2px solid #E0E0E0',
+  backgroundColor: selected ? '#E3F2FD' : '#FFF',
+  border: selected ? '3px solid #1976D2' : '2px solid #E0E0E0',
   borderRadius: '12px',
   padding: '16px',
   cursor: 'pointer',
@@ -97,10 +95,7 @@ const ActionButtons = styled(Box)({
 
 export const FavoriteLocationCard = ({
   favorite,
-  isSelected,
-  temperature,
-  precipitationProbability,
-  feelsLike,
+  selected,
   onClick,
   onAliasUpdate,
   onDelete,
@@ -150,9 +145,14 @@ export const FavoriteLocationCard = ({
     e.stopPropagation();
     onDelete(favorite.id);
   };
+  const { weather } = useCurrentWeatherByLocation({
+    city: favorite.city,
+    district: favorite.district,
+  });
+  if (!weather) return null;
 
   return (
-    <CardContainer ref={setNodeRef} style={style} isSelected={isSelected} onClick={onClick}>
+    <CardContainer ref={setNodeRef} style={style} selected={selected} onClick={onClick}>
       <CardHeader>
         <DragHandle {...attributes} {...listeners}>
           <DragIndicatorIcon fontSize='small' />
@@ -196,17 +196,17 @@ export const FavoriteLocationCard = ({
 
       <WeatherRow>
         <WeatherLabel>기온</WeatherLabel>
-        <WeatherValue>{temperature}°C</WeatherValue>
+        <WeatherValue>{weather.temperature}°C</WeatherValue>
       </WeatherRow>
 
       <WeatherRow>
         <WeatherLabel>강수확률</WeatherLabel>
-        <WeatherValue>{precipitationProbability}%</WeatherValue>
+        <WeatherValue>{weather.rain_probability || 0}%</WeatherValue>
       </WeatherRow>
 
       <WeatherRow>
         <WeatherLabel>체감온도</WeatherLabel>
-        <WeatherValue>{feelsLike}°C</WeatherValue>
+        <WeatherValue>{weather.feels_like}°C</WeatherValue>
       </WeatherRow>
     </CardContainer>
   );

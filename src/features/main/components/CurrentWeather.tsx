@@ -1,5 +1,5 @@
-// src/components/MainPage/CurrentWeather.tsx
-import { Box, Button } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
+import { useEffect } from 'react';
 import {
   CurrentWeatherCardHeader,
   InfoBox,
@@ -14,31 +14,50 @@ import {
 } from '../styles/CurrentWeatherStyles';
 import { WeatherIcon } from './WeatherIcon';
 import { getWeatherDescriptionKorean } from '../../../utils/weatherIcon';
+import { useCurrentWeather } from '../hooks/useCurrentWeather';
+import { useLocationStore } from '../../location/store/locationStore';
+import { useLocationName } from '../../../hooks/useLocationName';
 
 interface CurrentWeatherProps {
-  location: string;
-  temperature: number;
-  condition: string;
-  iconCode: string;
-  precipitation: number;
-  feelsLike: number;
   onEditLocation?: () => void;
 }
 
-export const CurrentWeather = ({
-  location,
-  temperature,
-  condition,
-  iconCode,
-  precipitation,
-  feelsLike,
-  onEditLocation,
-}: CurrentWeatherProps) => {
+export const CurrentWeather = ({ onEditLocation }: CurrentWeatherProps) => {
+  const { location } = useLocationStore();
+  const { loading: locationLoading, fetchLocationName } = useLocationName();
+  const { weather, isLoading: weatherLoading } = useCurrentWeather();
+
+  useEffect(() => {
+    if (!location) {
+      fetchLocationName();
+    }
+  }, [location, fetchLocationName]);
+
+  const isLoading = locationLoading || weatherLoading;
+
+  if (isLoading) {
+    return (
+      <WeatherCard>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+          <CircularProgress />
+        </Box>
+      </WeatherCard>
+    );
+  }
+
+  if (!weather) {
+    return (
+      <WeatherCard>
+        <Box sx={{ textAlign: 'center', padding: 4 }}>날씨 정보를 불러올 수 없습니다.</Box>
+      </WeatherCard>
+    );
+  }
+
   return (
     <WeatherCard>
       <CurrentWeatherCardHeader>
-        <LocationText>{location}</LocationText>
-        <Button
+        <LocationText>{location || weather.location_name}</LocationText>
+        {/* <Button
           onClick={onEditLocation}
           sx={{
             backgroundColor: '#5B9EFF',
@@ -53,29 +72,29 @@ export const CurrentWeather = ({
           }}
         >
           지역 설정
-        </Button>
+        </Button> */}
       </CurrentWeatherCardHeader>
 
       <TemperatureSection>
-        <WeatherIcon iconCode={iconCode} size={80} />
+        <WeatherIcon iconCode={weather.icon} size={80} />
         <Box>
-          <Temperature>{temperature} °C</Temperature>
-          <WeatherCondition>{getWeatherDescriptionKorean(condition)}</WeatherCondition>
+          <Temperature>{Math.round(weather.temperature)} °C</Temperature>
+          <WeatherCondition>{getWeatherDescriptionKorean(weather.condition)}</WeatherCondition>
         </Box>
       </TemperatureSection>
 
       <InfoGroup>
         <InfoBox>
           <InfoLabel>기온</InfoLabel>
-          <InfoValue>{temperature} °C</InfoValue>
+          <InfoValue>{Math.round(weather.temperature)} °C</InfoValue>
         </InfoBox>
         <InfoBox>
           <InfoLabel>강수확률</InfoLabel>
-          <InfoValue>{precipitation}%</InfoValue>
+          <InfoValue>{weather.rain_probability ?? 0}%</InfoValue>
         </InfoBox>
         <InfoBox>
           <InfoLabel>체감온도</InfoLabel>
-          <InfoValue>{feelsLike} °C</InfoValue>
+          <InfoValue>{Math.round(weather.feels_like)} °C</InfoValue>
         </InfoBox>
       </InfoGroup>
     </WeatherCard>

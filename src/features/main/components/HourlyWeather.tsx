@@ -8,76 +8,57 @@ import {
   TemperatureLabel,
 } from '../styles/HourlyWeatherStyles';
 import { WeatherIcon } from './WeatherIcon';
+import { useHourlyWeather } from '../hooks/useHourlyWeather';
+import { CircularProgress, Box } from '@mui/material';
 
-interface HourlyWeatherData {
-  time: string;
-  temperature: number;
-  icon: string;
-  condition: string;
-  rain_probability?: number;
-  feels_like?: number;
-}
-
-interface HourlyWeatherProps {
-  hourlyData?: HourlyWeatherData[];
-}
-
-export const HourlyWeather = ({ hourlyData = [] }: HourlyWeatherProps) => {
+export const HourlyWeather = () => {
+  const { forecast, isLoading } = useHourlyWeather();
   const { scrollRef, handlers } = useDragScroll({
     direction: 'horizontal',
     sensitivity: 2,
-    wheelSensitivity: 0.5, // 휠 감도 (낮을수록 부드러움)
+    wheelSensitivity: 0.5,
   });
 
-  // 기본 데이터 생성 (24시간)
-  const generateDefaultData = (): HourlyWeatherData[] => {
-    const now = new Date();
-    const currentHour = now.getHours();
-    const items: HourlyWeatherData[] = [];
+  // valid_time을 "지금" 또는 "HH:00" 형식으로 변환
+  const formatTime = (validTime: string, index: number): string => {
+    if (index === 0) return '지금';
 
-    // 24시간치 데이터 생성
-    for (let i = 0; i < 24; i++) {
-      const hour = (currentHour + i) % 24;
-
-      // 아이콘을 낮/밤에 따라 다르게
-      const isDay = hour >= 6 && hour < 18;
-
-      // 날씨 조건에 따라 다른 아이콘
-      const iconCodes = isDay ? ['01d', '02d', '03d', '04d'] : ['01n', '02n', '03n', '04n'];
-      const randomIcon = iconCodes[Math.floor(Math.random() * iconCodes.length)];
-
-      // 시간 표시
-      let timeLabel: string;
-      if (i === 0) {
-        timeLabel = '지금';
-      } else {
-        timeLabel = `${String(hour).padStart(2, '0')}:00`;
-      }
-
-      items.push({
-        time: timeLabel,
-        temperature: 15 + Math.floor(Math.random() * 10), // 15~24도 사이
-        icon: randomIcon,
-        condition: 'clear sky',
-        rain_probability: Math.floor(Math.random() * 50),
-      });
-    }
-
-    return items;
+    const date = new Date(validTime);
+    const hours = date.getHours();
+    return `${String(hours).padStart(2, '0')}:00`;
   };
 
-  const displayData = hourlyData.length > 0 ? hourlyData : generateDefaultData();
+  if (isLoading) {
+    return (
+      <HourlyWeatherCard>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 120 }}>
+          <CircularProgress size={30} />
+        </Box>
+      </HourlyWeatherCard>
+    );
+  }
+
+  if (!forecast || forecast.items.length === 0) {
+    return (
+      <HourlyWeatherCard>
+        <Box sx={{ textAlign: 'center', padding: 2 }}>시간별 날씨 정보를 불러올 수 없습니다.</Box>
+      </HourlyWeatherCard>
+    );
+  }
+
+  // 24시간치 데이터만 표시 (최대 24개)
+  const displayData = forecast.items.slice(0, 24);
 
   return (
     <HourlyWeatherCard>
       <HourlyScrollContainer ref={scrollRef} {...handlers}>
-        {displayData.map((data, index) => (
-          <HourlyItem key={`hour-${index}`}>
-            <HourLabel>{data.time}</HourLabel>
+        {displayData.map((item, index) => (
+          <HourlyItem key={item.id}>
+            <HourLabel>{formatTime(item.valid_time, index)}</HourLabel>
             <WeatherIconBox>
-              <WeatherIcon iconCode={data.icon} size={48} />
+              <WeatherIcon iconCode={item.icon} size={48} />
             </WeatherIconBox>
-            <TemperatureLabel>{data.temperature}°C</TemperatureLabel>
+            <TemperatureLabel>{Math.round(item.temperature)}°C</TemperatureLabel>
           </HourlyItem>
         ))}
       </HourlyScrollContainer>

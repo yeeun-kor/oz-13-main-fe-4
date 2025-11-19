@@ -126,10 +126,7 @@ export const FavoritesSection = ({
         <CardSlot key={favorite.id}>
           <FavoriteLocationCard
             favorite={favorite}
-            isSelected={selectedFavoriteId === favorite.id}
-            temperature={18}
-            precipitationProbability={5}
-            feelsLike={16}
+            selected={selectedFavoriteId === favorite.id}
             onClick={() => onFavoriteSelect(favorite.id)}
             onAliasUpdate={onAliasUpdate}
             onDelete={onDelete}

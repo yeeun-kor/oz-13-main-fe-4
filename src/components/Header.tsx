@@ -2,6 +2,9 @@ import { AppBar, Box, Button, Toolbar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../features/auth/store/authStore';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { useLocationStore } from '../features/location/store/locationStore';
+import { useCurrentWeather } from '../features/main/hooks/useCurrentWeather';
 
 const HeaderAppBar = styled(AppBar)({
   backgroundColor: '#ffffff',
@@ -58,12 +61,16 @@ export const Header = () => {
     alert('로그아웃 성공!!!! ');
     navigator('/');
   };
+  const { location } = useLocationStore();
+  const { weather } = useCurrentWeather();
 
   return (
     <>
       <HeaderAppBar position='static'>
         <Toolbar sx={{ justifyContent: 'space-between', px: 3 }}>
-          <LocationButton startIcon={'🔜'}>수원시 영통구</LocationButton>
+          <LocationButton startIcon={<LocationOnIcon />}>
+            {location || weather?.location_name}
+          </LocationButton>
           {/* <Logo src='/aws-logo.png' alt='AWS' /> 로고 추가시 이미지 여기에 넣기*/}
           <Box sx={{ width: '120px' }} />
         </Toolbar>
