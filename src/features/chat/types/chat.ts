@@ -3,6 +3,7 @@ export interface Message {
   role: 'ai' | 'user';
   text: string;
   created_at?: string; // ISO 8601 형식
+  isLoading?: boolean; // 로딩 상태
 }
 
 export interface ReqSendMessage {

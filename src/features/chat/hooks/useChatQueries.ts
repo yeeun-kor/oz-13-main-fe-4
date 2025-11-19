@@ -1,16 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReqSendMessage, ResSendMessage, ResChatHistory } from '../types/chat';
 import { sendMessage, getChatHistory } from '../api/chat';
 
 // 메시지를 서버로 보내기
 export const useSendMessage = () => {
-  const queryClient = useQueryClient();
-
   return useMutation<ResSendMessage, Error, ReqSendMessage>({
     mutationFn: sendMessage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chatHistory'] });
-    },
     onError: (error) => {
       console.log('대화 전송 실패 : ', error.message);
     },
