@@ -47,7 +47,6 @@ export default function SignUp() {
 
   //회원가입 버튼 클릭하면?mutation 불러서 비동기 통신해야함.
   const onSubmit: SubmitHandler<FormField> = (data) => {
-    //🎃confirm비밀번호와 emailCode는 제외해야함 -> 구조분해 할당
     const { passwordConfirm, emailCode, ...rest } = data;
     signUpMutation.mutate(rest, {
       onSuccess: () => {
@@ -257,12 +256,12 @@ export default function SignUp() {
               />
             </FormControl>
             <FormControl sx={{ flex: 1 }}>
-              <FormLabel htmlFor='named-select'>연령대</FormLabel>
+              <FormLabel htmlFor='age_group'>연령대</FormLabel>
               <Controller
                 name='age_group'
                 control={control}
                 render={({ field }) => (
-                  <Select {...field} id='named-select'>
+                  <Select {...field} id='age_group'>
                     <MenuItem value={'10'}>10대</MenuItem>
                     <MenuItem value={'20'}>20대</MenuItem>
                     <MenuItem value={'30'}>30대</MenuItem>
@@ -302,6 +301,34 @@ export default function SignUp() {
               </Button>
             </Stack>
           </FormControl>
+
+          {isEmailVerified ? (
+            <FormControl>
+              <FormLabel htmlFor='emailCode'>이메일 인증코드</FormLabel>
+              <TextField
+                {...register('emailCode')}
+                error={!!errors.emailCode}
+                helperText={errors.emailCode?.message}
+                fullWidth
+                id='emailCode'
+                placeholder='123456'
+                variant='outlined'
+                disabled={isEmailCodeChecked}
+              />
+              <Button
+                variant='contained'
+                color='success'
+                type='button'
+                onClick={handleEmailCodeValidate}
+                disabled={isEmailCodeChecked}
+              >
+                인증코드 확인
+              </Button>
+            </FormControl>
+          ) : (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
+            <></>
+          )}
 
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
@@ -343,33 +370,7 @@ export default function SignUp() {
               />
             </FormControl>
           </Stack>
-          {isEmailVerified ? (
-            <FormControl>
-              <FormLabel htmlFor='emailCode'>이메일 인증코드</FormLabel>
-              <TextField
-                {...register('emailCode')}
-                error={!!errors.emailCode}
-                helperText={errors.emailCode?.message}
-                fullWidth
-                id='emailCode'
-                placeholder='123456'
-                variant='outlined'
-                disabled={isEmailCodeChecked}
-              />
-              <Button
-                variant='contained'
-                color='success'
-                type='button'
-                onClick={handleEmailCodeValidate}
-                disabled={isEmailCodeChecked}
-              >
-                인증코드 확인
-              </Button>
-            </FormControl>
-          ) : (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <></>
-          )}
+
           <BaseModal
             isOpen={emailShowModal}
             onClose={() => setEmailShowModal(false)}

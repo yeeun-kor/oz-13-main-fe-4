@@ -12,10 +12,6 @@ export interface ProfileSectionProps {
   updateValidation: (key: keyof ValidationState, value: boolean) => void;
 }
 
-export interface EmailSectionProps {
-  isEditMode: boolean;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface PasswordSectionProps {
   // 독립적으로 동작하므로 props 불필요

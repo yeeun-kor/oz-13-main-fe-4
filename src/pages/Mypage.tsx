@@ -138,7 +138,13 @@ export default function Mypage() {
           />
 
           {/* 이메일 변경 섹션 */}
-          <EmailSection isEditMode={isEditMode} />
+          <EmailSection
+            isEditMode={isEditMode}
+            onEditModeChange={setIsEditMode}
+            form={form}
+            validationState={validationState}
+            updateValidation={updateValidation}
+          />
 
           {/* 모달 */}
           <BaseModal

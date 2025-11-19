@@ -20,9 +20,11 @@ const CardContainer = styled(Box)({
   backgroundColor: '#FFF',
   border: '2px solid #E0E0E0',
   borderRadius: '12px',
-  padding: '16px',
+  padding: '24px',
   cursor: 'grab',
   transition: 'all 0.2s',
+  width: '100%',
+  minHeight: '60px', // 최소 높이 설정
   '&:hover': {
     borderColor: '#1976D2',
     transform: 'translateY(-2px)',

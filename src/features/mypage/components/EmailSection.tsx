@@ -16,20 +16,24 @@ import {
   useSendEmailCodeMutation,
   useVerifyEmailCodeMutation,
 } from '../../auth/hooks/useEmailVerificationMutation';
-import { useMypageForm } from '../hooks/useMypageForm';
-import { EmailSectionProps } from '../types/mypage.types';
+import { ProfileSectionProps } from '../types/mypage.types';
 
 const FormGrid = styled(Grid)(() => ({
   display: 'flex',
   flexDirection: 'column',
 }));
 
-export default function EmailSection({ isEditMode }: EmailSectionProps) {
-  const { form, validationState, updateValidation } = useMypageForm();
+export default function EmailSection({
+  isEditMode,
+  onEditModeChange,
+  form,
+  validationState,
+  updateValidation,
+}: ProfileSectionProps) {
   const {
     register,
     watch,
-    formState: { errors },
+    formState: { errors, defaultValues },
   } = form;
 
   const sendEmailCode = useSendEmailCodeMutation();
@@ -41,6 +45,15 @@ export default function EmailSection({ isEditMode }: EmailSectionProps) {
 
   const handleEmailValidate = async () => {
     const email = watch('email') as string;
+    const currentEmail = defaultValues?.email as string;
+
+    // 현재 이메일과 동일한지 확인
+    if (email === currentEmail) {
+      setModalTitle('이메일 변경');
+      setModalMessage('현재 사용 중인 이메일과 동일합니다. 새로운 이메일을 입력해주세요.');
+      setShowModal(true);
+      return;
+    }
 
     sendEmailCode.mutate(
       { email },

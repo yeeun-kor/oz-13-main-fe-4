@@ -7,22 +7,20 @@ import FavoriteRegionModal from '../../../components/Modal/FavoriteRegionModal';
 import { useFavoriteLocations } from '../hooks/useFavoriteLocations';
 import FavoriteLocationCard from './FavoriteLocationCard';
 
-const MAX_FAVORITES = 3;
+const MAX_FAVORITES = 4;
 
 const Container = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   gap: '16px',
   padding: '16px',
+  width: '100%',
 });
 
 const GridLayout = styled(Box)({
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)',
+  gridTemplateColumns: 'repeat(2, 1fr)',
   gap: '24px',
-  '@media (max-width: 1024px)': {
-    gridTemplateColumns: 'repeat(2, 1fr)',
-  },
   '@media (max-width: 768px)': {
     gridTemplateColumns: '1fr',
   },
@@ -57,7 +55,7 @@ const AddButton = styled('button')({
 });
 
 export default function FavoriteLocationSection() {
-  const { favorites, isLoading, deleteFavorite, updateAlias, reorderFavorites } =
+  const { favorites, isLoading, addFavorite, deleteFavorite, updateAlias, reorderFavorites } =
     useFavoriteLocations();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -107,35 +105,16 @@ export default function FavoriteLocationSection() {
     setModalOpen(false);
   };
 
-  const handleModalSave = () => {
+  const handleModalSave = (data: { city: string; district: string }) => {
+    addFavorite({
+      city: data.city,
+      district: data.district,
+      alias: `${data.city} ${data.district}`, // 기본 alias 설정 (나중에 수정 가능)
+    });
     setModalOpen(false);
   };
 
   if (isLoading) return <div>로딩 중...</div>;
-
-  // const slots = Array.from({ length: MAX_FAVORITES }, (_, index) => {
-  //   const favorite = safeFavorites[index];
-
-  //   if (favorite?.id) {
-  //     return (
-  //       <CardSlot key={favorite.id}>
-  //         <FavoriteLocationCard
-  //           favorite={favorite}
-  //           onAliasUpdate={handleAliasUpdate}
-  //           onDelete={handleDelete}
-  //         />
-  //       </CardSlot>
-  //     );
-  //   } else if (index === safeFavorites.length && safeFavorites.length < MAX_FAVORITES) {
-  //     return (
-  //       <CardSlot key={`add-${index}`}>
-  //         <AddButton onClick={handleAddClick}>+</AddButton>
-  //       </CardSlot>
-  //     );
-  //   } else {
-  //     return <CardSlot key={`empty-${index}`} />;
-  //   }
-  // });
 
   // 기존 MAX_FAVORITES 기반 slots 배열 생성 대신
   const slots = [
