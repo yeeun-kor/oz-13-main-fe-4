@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ClothingItem } from '../types/clothing';
+import { useIntersectionObserver } from '../../../hooks/useIntersectionObserver';
 
 const IconContainer = styled(Box)({
   display: 'flex',
@@ -27,9 +28,11 @@ interface OutfitItemIconProps {
   showName?: boolean;
 }
 export const OutfitItemIcon = ({ item, showName = true }: OutfitItemIconProps) => {
+  const refCallback = useIntersectionObserver();
+
   return (
     <IconContainer>
-      <IconImage src={item.icon} alt={item.name} loading='lazy' />
+      <IconImage ref={refCallback} data-src={item.icon} alt={item.name} loading='lazy' />
       {showName && <ItemName>{item.name}</ItemName>}
     </IconContainer>
   );

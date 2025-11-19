@@ -2,6 +2,7 @@
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { getWeatherIconUrl } from '../../../utils/weatherIcon';
+import { useIntersectionObserver } from '../../../hooks/useIntersectionObserver';
 
 const IconImage = styled('img')<{ size: number }>(({ size }) => ({
   width: `${size}px`,
@@ -28,6 +29,7 @@ export const WeatherIcon = ({
   quality = '2x',
   alt = '날씨 아이콘',
 }: WeatherIconProps) => {
+  const refCallback = useIntersectionObserver();
   const iconUrl = getWeatherIconUrl(iconCode, quality);
 
   if (!iconUrl) {
@@ -36,7 +38,7 @@ export const WeatherIcon = ({
 
   return (
     <IconContainer>
-      <IconImage src={iconUrl} alt={alt} size={size} loading='lazy' />
+      <IconImage ref={refCallback} data-src={iconUrl} alt={alt} size={size} loading='lazy' />
     </IconContainer>
   );
 };

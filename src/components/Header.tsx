@@ -1,21 +1,21 @@
 import { AppBar, Box, Button, Toolbar } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../features/auth/store/authStore';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useLocationStore } from '../features/location/store/locationStore';
 import { useCurrentWeather } from '../features/main/hooks/useCurrentWeather';
-
+import fe_logo from '../assets/fe_logo.webp';
 const HeaderAppBar = styled(AppBar)({
   backgroundColor: '#ffffff',
   boxShadow: 'none',
   borderBottom: '1px solid #e0e0e0',
 });
-// 로고 추가시 삽입
-// const Logo = styled('img')({
-//   height: '32px',
-//   cursor: 'pointer',
-// });
+const Logo = styled('img')({
+  height: '70px',
+  cursor: 'pointer',
+  marginBottom: '4px',
+});
 const LocationButton = styled(Button)({
   color: '#666666',
   textTransform: 'none',
@@ -71,7 +71,10 @@ export const Header = () => {
           <LocationButton startIcon={<LocationOnIcon />}>
             {location || weather?.location_name}
           </LocationButton>
-          {/* <Logo src='/aws-logo.png' alt='AWS' /> 로고 추가시 이미지 여기에 넣기*/}
+          <Link to='/'>
+            <Logo src={fe_logo} alt='AWS' />
+          </Link>
+
           <Box sx={{ width: '120px' }} />
         </Toolbar>
       </HeaderAppBar>
