@@ -78,7 +78,7 @@ export default function PasswordSection() {
                   form.reset();
                 }}
                 variant='contained'
-                color='warning'
+                color='secondary'
                 size='small'
                 type='button'
               >

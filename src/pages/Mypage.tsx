@@ -120,7 +120,7 @@ export default function Mypage() {
                     sx={{ minWidth: 'fit-content', whiteSpace: 'nowrap' }}
                     variant='contained'
                     size='small'
-                    color='warning'
+                    color='secondary'
                     type='button'
                   >
                     취소
