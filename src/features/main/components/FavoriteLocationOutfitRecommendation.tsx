@@ -16,6 +16,7 @@ import {
 } from '../styles/FavoriteStyles';
 import { FavoriteLocation } from '../../favorite/api/favoriteAPI';
 import { useFavoriteOutfit } from '../hooks/useFavoriteOutfit';
+import { useCurrentWeatherByLocation } from '../hooks/useCurrentWeatherByLocation';
 
 interface FavoriteLocationOutfitRecommendationProps {
   favorite: FavoriteLocation;
@@ -28,9 +29,17 @@ export const FavoriteLocationOutfitRecommendation = ({
   const [explanation, setExplanation] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { outfit, error, refetch } = useFavoriteOutfit({
+  // const { outfit, error, refetch } = useFavoriteOutfit({
+  //   city: favorite.city,
+  //   district: favorite.district,
+  // });
+  const { weather } = useCurrentWeatherByLocation({
     city: favorite.city,
     district: favorite.district,
+  });
+  const { outfit } = useFavoriteOutfit({
+    temperature: weather?.temperature ?? null,
+    condition: weather?.condition ?? null,
   });
 
   useEffect(() => {

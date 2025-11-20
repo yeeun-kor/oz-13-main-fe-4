@@ -5,11 +5,11 @@ interface OutfitRecommendation {
   explanation: string;
 }
 export const getOutfitRecommendation = (
-  temperature: number,
-  condition: string = 'Clear'
+  temperature: number | null,
+  condition: string | null = 'Clear'
 ): OutfitRecommendation => {
-  const temp = temperature;
-  const cond = condition.toLowerCase();
+  const temp = temperature ?? 0;
+  const cond = condition?.toLowerCase() ?? '';
 
   let rec_1 = '';
   let rec_2 = '';
