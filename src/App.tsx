@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import LogIn from './pages/auth/LogIn';
 import SignUp from './pages/auth/SignUp';
+import KakaoCallback from './pages/auth/KakaoCallback';
 import Layout from './pages/Layout';
 import { MainPage } from './pages/main/MainPage';
 import Mypage from './pages/Mypage';
@@ -19,6 +20,7 @@ function App() {
         <Route index element={<MainPage />} />
         <Route path='/login' element={<LogIn />} />
         <Route path='/signup' element={<SignUp />} />
+        <Route path='/auth/kakao/callback' element={<KakaoCallback />} />
         <Route path='/mypage' element={<Mypage />} />
         <Route
           path='/diary'

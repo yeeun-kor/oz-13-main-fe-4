@@ -11,14 +11,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { GoogleButton, KakaoButton, NaverButton } from '../../components/Button';
 import ForgotPassword from '../../components/Modal/ForgotPassword';
 import { useLogInMutation } from '../../features/auth/hooks/useLogInMutation';
+import { useSocialLoginMutation } from '../../features/auth/hooks/useSocialLoginMutation';
 import { FormFieldLogin, logInSchema } from '../../features/auth/types/zodTypes';
 import { CardMui, ContainerMui } from '../../styles/AuthStyle';
+import { initKakao, loginWithKakao } from '../../utils/kakaoAuth';
 
 export default function LogIn() {
   const navigator = useNavigate();
@@ -26,6 +28,12 @@ export default function LogIn() {
   const [isAutoLogin, setIsAutoLogin] = useState(false); // ✅ 자동로그인 상태
 
   const logInMutation = useLogInMutation();
+  const socialLogInMutation = useSocialLoginMutation();
+
+  // 카카오 SDK 초기화
+  useEffect(() => {
+    initKakao();
+  }, []);
 
   //2. react-hook-form 사용
   const {
@@ -54,9 +62,16 @@ export default function LogIn() {
     );
   };
 
+  const handleKakaoLogin = () => {
+    // 카카오 로그인 페이지로 리다이렉트
+    // 인증 후 /auth/kakao/callback 으로 돌아옴
+    loginWithKakao();
+  };
+
   const handleClickOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -141,7 +156,7 @@ export default function LogIn() {
           <GoogleButton fullWidth onClick={() => alert('Sign in with Google')}>
             구글 로그인
           </GoogleButton>
-          <KakaoButton fullWidth onClick={() => alert('Sign in with 카카오')}>
+          <KakaoButton fullWidth onClick={handleKakaoLogin}>
             카카오 로그인
           </KakaoButton>
           <NaverButton fullWidth onClick={() => alert('Sign in with 네이버')}>

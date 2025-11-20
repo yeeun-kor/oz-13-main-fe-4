@@ -138,6 +138,7 @@ export type RequestSocialLoginDTO = {
 
 export type ResponseSocialLoginDTO = ApiResponse<{
   user: User;
+  access: string;
 }>;
 
 //==================== 소셜 계정 연결 ====================

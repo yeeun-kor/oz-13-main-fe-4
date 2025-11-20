@@ -10,6 +10,7 @@ import {
   RequestPasswordChangeDTO,
   RequestProfileUpdateDTO,
   RequestSignUpDTO,
+  RequestSocialLoginDTO,
   ResponseEmailSendDTO,
   ResponseEmailVerifyDTO,
   ResponseLoginDTO,
@@ -17,6 +18,8 @@ import {
   ResponsePasswordChangeDTO,
   ResponseProfileUpdateDTO,
   ResponseRefreshToken,
+  ResponseSocialLoginDTO,
+  SocialProvider,
 } from '../types/auth';
 
 //- ==================== 닉네임 검증 ====================
@@ -87,6 +90,23 @@ export async function logIn(data: RequestLoginDTO): Promise<ResponseLoginDTO> {
     if (axios.isAxiosError(error) && error.response) {
       const apiError = error.response.data;
       throw new Error(apiError.error?.message || '로그인 실패');
+    }
+    throw new Error('네트워크 오류');
+  }
+}
+//- ==================== 소셜 로그인 ====================
+export async function socialLogin(
+  provider: SocialProvider,
+  data: RequestSocialLoginDTO
+): Promise<ResponseSocialLoginDTO> {
+  try {
+    const res = await instance.post(`/auth/social/${provider}/login`, data);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    if (axios.isAxiosError(error) && error.response) {
+      const apiError = error.response.data;
+      throw new Error(apiError.error?.message || '소셜 로그인 실패');
     }
     throw new Error('네트워크 오류');
   }
