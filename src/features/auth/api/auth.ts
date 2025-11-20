@@ -94,23 +94,7 @@ export async function logIn(data: RequestLoginDTO): Promise<ResponseLoginDTO> {
     throw new Error('네트워크 오류');
   }
 }
-//- ==================== 소셜 로그인 ====================
-export async function socialLogin(
-  provider: SocialProvider,
-  data: RequestSocialLoginDTO
-): Promise<ResponseSocialLoginDTO> {
-  try {
-    const res = await instance.post(`/auth/social/${provider}/login`, data);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    if (axios.isAxiosError(error) && error.response) {
-      const apiError = error.response.data;
-      throw new Error(apiError.error?.message || '소셜 로그인 실패');
-    }
-    throw new Error('네트워크 오류');
-  }
-}
+
 //- ==================== 리프레쉬토큰 ====================
 export async function refreshToken(): Promise<ResponseRefreshToken> {
   try {
@@ -176,6 +160,33 @@ export async function updatePassword(
       const apiError = error.response.data;
       throw new Error(apiError.error?.message || '비밀번호 수정 실패');
     }
+    throw new Error('네트워크 오류');
+  }
+}
+
+//- ==================== 소셜 로그인 ====================
+export async function socialLogin(
+  provider: SocialProvider,
+  data: RequestSocialLoginDTO
+): Promise<ResponseSocialLoginDTO> {
+  try {
+    console.log('📤 소셜 로그인 요청:', provider, data);
+    const res = await instance.post(`/social/${provider}/login`, data);
+    console.log('✅ 소셜 로그인 응답:', res.data);
+    return res.data;
+  } catch (error) {
+    console.log('❌ 전체 에러:', error);
+    console.log('❌ 에러 타입:', typeof error); // 추가
+    console.log('❌ isAxiosError:', axios.isAxiosError(error)); // 추가
+
+    if (axios.isAxiosError(error) && error.response) {
+      console.log('❌ Axios 에러 - 응답 데이터:', error.response.data);
+      const apiError = error.response.data;
+      throw new Error(apiError.error?.message || '소셜 로그인 실패');
+    }
+
+    // 👇 일반 에러 객체인 경우 추가 처리
+    console.log('❌ 일반 에러 객체:', JSON.stringify(error, null, 2));
     throw new Error('네트워크 오류');
   }
 }
